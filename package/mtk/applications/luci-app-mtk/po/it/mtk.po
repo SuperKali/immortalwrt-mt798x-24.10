@@ -1,0 +1,527 @@
+Capisco che hai bisogno del file in formato .po (Portable Object). Il formato PO è un formato standard per i file di traduzione. Ecco la traduzione dal cinese all'italiano nel formato .po richiesto:
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: \n"
+"Last-Translator: \n"
+"Plural-Forms: \n"
+"Language: it\n"
+
+msgid "Auto"
+msgstr "Automatico"
+
+msgid "Disable"
+msgstr "Disabilita"
+
+msgid "US"
+msgstr "US (Stati Uniti)"
+
+msgid "JP"
+msgstr "JP (Giappone)"
+
+msgid "FR"
+msgstr "FR (Francia)"
+
+msgid "IE"
+msgstr "IE (Irlanda)"
+
+msgid "CN"
+msgstr "CN (Cina)"
+
+msgid "NONE"
+msgstr "Nessuno"
+
+msgid "Short"
+msgstr "Short (Corto)"
+
+msgid "long"
+msgstr "Long (Lungo)"
+
+msgid "Enable"
+msgstr "Abilita"
+
+msgid "Mandatory"
+msgstr "Obbligatorio"
+
+msgid "Always On"
+msgstr "Sempre attivo"
+
+msgid "Always Off"
+msgstr "Sempre disattivato"
+
+msgid "Tempature"
+msgstr "Temperatura"
+
+msgid "Tx Power"
+msgstr "Potenza di trasmissione"
+
+msgid "Driver version"
+msgstr "Versione driver"
+
+msgid "Current Band"
+msgstr "Banda attuale"
+
+msgid "Work mode"
+msgstr "Modalità operativa"
+
+msgid "CONFIG"
+msgstr "Configurazione"
+
+msgid "RELOAD"
+msgstr "Ricarica"
+
+msgid "ADD"
+msgstr "Aggiungi"
+
+msgid "RECONNECT"
+msgstr "Riconnetti"
+
+msgid "DISABLE"
+msgstr "Disabilita"
+
+msgid "ENABLE"
+msgstr "Abilita"
+
+msgid "REMOVE"
+msgstr "Rimuovi"
+
+msgid "Station List"
+msgstr "Lista stazioni connesse"
+
+msgid "Interface"
+msgstr "Interfaccia"
+
+msgid "MAC-Address"
+msgstr "Indirizzo MAC"
+
+msgid "Signal"
+msgstr "Potenza segnale"
+
+msgid "TX Rate"
+msgstr "Velocità TX"
+
+msgid "Rx Rate"
+msgstr "Velocità RX"
+
+msgid "Connected Time"
+msgstr "Tempo di connessione"
+
+msgid "Channel"
+msgstr "Canale"
+
+msgid "Security Mode"
+msgstr "Modalità sicurezza"
+
+msgid "Action"
+msgstr "Azione"
+
+msgid "Choose This"
+msgstr "Scegli questo"
+
+msgid "40MHz HT Ext Channel"
+msgstr "Canale esteso HT 40MHz"
+
+msgid "80MHz Second VHT Channel"
+msgstr "Secondo canale VHT 80MHz"
+
+msgid "Type"
+msgstr "Tipo di interfaccia"
+
+msgid "Status"
+msgstr "Stato"
+
+msgid "DISCONNECT"
+msgstr "Disconnetti"
+
+msgid "Connected"
+msgstr "Connesso"
+
+msgid "Disconnected"
+msgstr "Disconnesso"
+
+msgid "FATAL ERROR: Incorrect Profile Settings"
+msgstr "ERRORE FATALE: Impostazioni profilo non corrette"
+
+msgid "Error: value not present in dat file"
+msgstr "Errore: valore non presente nel file dat"
+
+msgid "Wireless is disabled or not associated"
+msgstr "Wireless disabilitato o non associato"
+
+msgid "Processing request."
+msgstr "Elaborazione richiesta in corso..."
+
+msgid "need reload to apply changes"
+msgstr "Riavviare il wireless per applicare le modifiche"
+
+msgid "Click here"
+msgstr "Clicca qui"
+
+msgid "to apply changes"
+msgstr "per applicare le modifiche"
+
+msgid "Wireless Mode"
+msgstr "Modalità wireless"
+
+msgid "Chip Configurations"
+msgstr "Configurazioni chip"
+
+msgid "Device Configuration"
+msgstr "Configurazione dispositivo"
+
+msgid "Interface Configurations"
+msgstr "Configurazioni interfaccia"
+
+msgid "ApCli Configurations"
+msgstr "Configurazioni ApCli"
+
+msgid "Loading connection information of"
+msgstr "Caricamento informazioni di connessione"
+
+msgid "ApCli Available Wireless Networks"
+msgstr "Reti wireless disponibili per ApCli"
+
+msgid "ApCli Connection Configurations"
+msgstr "Configurazioni connessione ApCli"
+
+msgid "Decline BA Request"
+msgstr "Rifiuta richiesta BA"
+
+msgid "Reverse Direction Grant (RDG)"
+msgstr "Concessione direzione inversa (RDG)"
+
+msgid "BA Win size"
+msgstr "Dimensione finestra BA"
+
+msgid "HT Disallow TKIP"
+msgstr "Disabilita TKIP HT"
+
+msgid "Wi-Fi HWNAT"
+msgstr "Accelerazione hardware Wi-Fi"
+
+msgid "E2pAccessMode"
+msgstr "Modalità accesso E2p"
+
+msgid "Beacon Interval"
+msgstr "Intervallo Beacon"
+
+msgid "Data Beacon Rate (DTIM)"
+msgstr "Frequenza beacon dati (DTIM)"
+
+msgid "BG Protection Mode"
+msgstr "Modalità protezione BG"
+
+msgid "Short Preamble"
+msgstr "Preambolo corto"
+
+msgid "TX Burst"
+msgstr "TX Burst"
+
+msgid "Short Slot"
+msgstr "Slot corto"
+
+msgid "Channel Auto"
+msgstr "Canale automatico"
+
+msgid "BSS color"
+msgstr "Colore BSS"
+
+msgid "TWT Support"
+msgstr "Supporto TWT"
+
+msgid "Country Code"
+msgstr "Codice paese"
+
+msgid "Country Region"
+msgstr "Regione paese"
+
+msgid "Channel BandWidth"
+msgstr "Larghezza di banda canale"
+
+msgid "TX Stream"
+msgstr "Stream TX"
+
+msgid "RX Stream"
+msgstr "Stream RX"
+
+msgid "TX Power"
+msgstr "Potenza TX"
+
+msgid "DFS"
+msgstr "Selezione frequenza dinamica (DFS)"
+
+msgid "Beam Forming and MIMO Setting"
+msgstr "Impostazioni Beam Forming e MIMO"
+
+msgid "Spatial Reuse"
+msgstr "Riuso spaziale"
+
+msgid "Auth Mode"
+msgstr "Modalità autenticazione"
+
+msgid "Encryption"
+msgstr "Crittografia"
+
+msgid "Key Renewal Interval"
+msgstr "Intervallo rinnovo chiave"
+
+msgid "Key"
+msgstr "Chiave"
+
+msgid "MFPC"
+msgstr "MFPC"
+
+msgid "MFPR"
+msgstr "MFPR"
+
+msgid "Hidden SSID"
+msgstr "SSID nascosto"
+
+msgid "AP Isolation"
+msgstr "Isolamento AP"
+
+msgid "WMM Capable"
+msgstr "Capacità WMM"
+
+msgid "Fixed TX Rate"
+msgstr "Velocità TX fissa"
+
+msgid "HT STBC"
+msgstr "HT STBC"
+
+msgid "HT LDPC"
+msgstr "HT LDPC"
+
+msgid "VHT STBC"
+msgstr "VHT STBC"
+
+msgid "VHT LDPC"
+msgstr "VHT LDPC"
+
+msgid "DLS Capable"
+msgstr "Capacità DLS"
+
+msgid "802.11k RRM"
+msgstr "802.11k RRM"
+
+msgid "802.11r FT"
+msgstr "802.11r FT"
+
+msgid "APSD Capable"
+msgstr "Capacità APSD"
+
+msgid "Fragment Threshold"
+msgstr "Soglia frammentazione"
+
+msgid "RTS Threshold"
+msgstr "Soglia RTS"
+
+msgid "VHT Short GI"
+msgstr "VHT Short GI"
+
+msgid "VHT BW Signaling"
+msgstr "Segnalazione BW VHT"
+
+msgid "Dynamic"
+msgstr "Dinamico"
+
+msgid "HT Protection"
+msgstr "Protezione HT"
+
+msgid "HT Guard Interval"
+msgstr "Intervallo guardia HT"
+
+msgid "HT Operating Mode"
+msgstr "Modalità operativa HT"
+
+msgid "HT Mixed Mode"
+msgstr "Modalità mista HT"
+
+msgid "HT Green Field"
+msgstr "HT Green Field"
+
+msgid "Auto Block ACK"
+msgstr "Auto Block ACK"
+
+msgid "Access Control"
+msgstr "Controllo accessi"
+
+msgid "Access Policy"
+msgstr "Politica controllo accessi"
+
+msgid "Access control MAC address list"
+msgstr "Lista indirizzi MAC controllo accessi"
+
+msgid "White List"
+msgstr "Lista bianca"
+
+msgid "Black List"
+msgstr "Lista nera"
+
+msgid "Basic Settings"
+msgstr "Impostazioni base"
+
+msgid "HE Settings"
+msgstr "Impostazioni HE"
+
+msgid "DL OFDMA"
+msgstr "DL OFDMA"
+
+msgid "UL OFDMA"
+msgstr "UL OFDMA"
+
+msgid "DL MU-MIMO"
+msgstr "DL MU-MIMO"
+
+msgid "UL MU-MIMO"
+msgstr "UL MU-MIMO"
+
+msgid "Scan Wireless Network"
+msgstr "Scansione rete wireless"
+
+msgid "ApClient Mode"
+msgstr "Modalità client AP"
+
+msgid "APClient/Repeater Mode."
+msgstr "Modalità client/ripetitore AP."
+
+msgid "MAC Repeater Mode"
+msgstr "Modalità ripetitore MAC"
+
+msgid "Root AP SSID"
+msgstr "SSID AP principale"
+
+msgid "Root AP Channel"
+msgstr "Canale AP principale"
+
+msgid "Root AP Authentication Mode"
+msgstr "Modalità autenticazione AP principale"
+
+msgid "Root AP Encryption"
+msgstr "Crittografia AP principale"
+
+msgid "Root AP WPA Key"
+msgstr "Chiave WPA AP principale"
+
+msgid "ApCli MFPC"
+msgstr "ApCli MFPC"
+
+msgid "ApCli MFPR"
+msgstr "ApCli MFPR"
+
+msgid "ApCli MFPSHA256"
+msgstr "ApCli MFPSHA256"
+
+msgid "WEP Default Key"
+msgstr "WEP Default Key"
+
+msgid "Root AP WEP Key"
+msgstr "Chiave WEP AP principale"
+
+msgid "Length"
+msgstr "Lunghezza"
+
+msgid "WEP Key"
+msgstr "Chiave WEP"
+
+msgid "WEP Key Type"
+msgstr "Tipo chiave WEP"
+
+msgid "PMK Cache Period"
+msgstr "Periodo cache PMK"
+
+msgid "WEP for 8021X"
+msgstr "WEP per 8021X"
+
+msgid "Pre-Authentication"
+msgstr "Pre-autenticazione"
+
+msgid "Radius Server IP"
+msgstr "IP server Radius"
+
+msgid "Radius Server Port"
+msgstr "Porta server Radius"
+
+msgid "Radius Key"
+msgstr "Chiave Radius"
+
+msgid "Radius Session Timeout"
+msgstr "Timeout sessione Radius"
+
+msgid "Radius Idle Timeout"
+msgstr "Timeout inattività Radius"
+
+msgid "MFPSHA256"
+msgstr "MFPSHA256"
+
+msgid "Please wait while the settings are being applied."
+msgstr "Attendere mentre le impostazioni vengono applicate."
+
+msgid "Please wait while the request is being processed."
+msgstr "Attendere mentre la richiesta viene elaborata."
+
+msgid "No wireless device found!"
+msgstr "Nessun dispositivo wireless trovato!"
+
+msgid "Please input a valid radius server port number."
+msgstr "Inserire un numero di porta server Radius valido."
+
+msgid "The radius shared secret contains invalid characters."
+msgstr "La chiave condivisa Radius contiene caratteri non validi."
+
+msgid "Please input a valid session timeout number or u may have left it empty."
+msgstr "Inserire un valore di timeout sessione valido o potrebbe essere vuoto."
+
+msgid "Radius session time out is empty."
+msgstr "Timeout sessione Radius è vuoto."
+
+msgid "Please input a valid idle timeout number or u may have left it empty."
+msgstr "Inserire un valore di timeout inattività valido o potrebbe essere vuoto."
+
+msgid "Radius idle time out is empty."
+msgstr "Timeout inattività Radius è vuoto."
+
+msgid "IGMP Snooping"
+msgstr "IGMP Snooping"
+
+msgid "Security"
+msgstr "Sicurezza"
+
+msgid "Restore Profile to Factory Settings"
+msgstr "Ripristina profilo alle impostazioni di fabbrica"
+
+msgid "Are you sure to RELOAD"
+msgstr "Sei sicuro di voler RICARICARE"
+
+msgid "Are you sure to DISABLE"
+msgstr "Sei sicuro di voler DISABILITARE"
+
+msgid "Are you sure to REMOVE"
+msgstr "Sei sicuro di voler RIMUOVERE"
+
+msgid "Are you sure to RECONNECT"
+msgstr "Sei sicuro di voler RICONNETTERE"
+
+msgid "Are you sure to DISCONNECT"
+msgstr "Sei sicuro di voler DISCONNETTERE"
+
+msgid "Are you sure to ADD wireless interface?"
+msgstr "Sei sicuro di voler AGGIUNGERE l'interfaccia wireless?"
+
+msgid "Enable wireless device"
+msgstr "Abilita dispositivo wireless"
+
+msgid "Wireless device is disabled"
+msgstr "Dispositivo wireless disabilitato"
+
+msgid "Kick STA Threshold"
+msgstr "Soglia di disconnessione STA"
+
+msgid "STA Assoc Threshold"
+msgstr "Soglia di associazione STA"

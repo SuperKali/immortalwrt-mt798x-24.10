@@ -1,0 +1,53 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Target Wake Time"
+msgstr "Tempo di risveglio programmato (TWT)"
+
+msgid "MU-MIMO DL"
+msgstr "MU-MIMO downlink"
+
+msgid "MU-MIMO UL"
+msgstr "MU-MIMO uplink"
+
+msgid "OFDMA DL"
+msgstr "OFDMA downlink"
+
+msgid "OFDMA UL"
+msgstr "OFDMA uplink"
+
+msgid "A-MSDU"
+msgstr "Aggregazione MSDU (A-MSDU)"
+
+msgid "Auto Block ACK"
+msgstr "Conferma automatica a blocchi"
+
+msgid "U-APSD"
+msgstr "Modalità risparmio energetico U-APSD"
+
+msgid "Kick low RSSI station threshold"
+msgstr "Soglia di disconnessione per stazioni con segnale debole"
+
+msgid "Station associate threshold"
+msgstr "Soglia di associazione stazioni"
+
+msgid "802.11V roam steering threshold"
+msgstr "Soglia di indirizzamento roaming 802.11V"
+
+msgid "802.11V roam target bssid"
+msgstr "BSSID di destinazione roaming 802.11V"
+
+msgid "only supports mt_wifi driver"
+msgstr "Supporta solo driver MTK proprietari, i parametri relativi al dominio di roaming vengono generati automaticamente senza configurazione. Verificare che gli IP LAN del router siano nella stessa subnet"
+
+msgid "Wireless HWNAT"
+msgstr "Accelerazione hardware wireless"
+
+msgid "Band Steering"
+msgstr "Indirizza i dispositivi dual-band 2.4G con segnale forte verso la banda 5G"
+
+msgid "Wireless configuration error"
+msgstr "Errore configurazione wireless"
+
+msgid "At least one MBSSID needs to be reserved"
+msgstr "È necessario riservare almeno un MBSSID"
