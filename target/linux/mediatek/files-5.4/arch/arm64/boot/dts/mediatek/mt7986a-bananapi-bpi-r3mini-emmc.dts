@@ -48,28 +48,28 @@
 	fan: pwm-fan {
 		compatible = "pwm-fan";
 		#cooling-cells = <2>;
-		cooling-levels = <220 160 80 40>;
+		cooling-levels = <255 115 85 0>;
 		pwms = <&pwm 0 10000 0>;
 		status = "okay";
 	};
 
-        reg_1p8v: regulator-1p8v {
-                compatible = "regulator-fixed";
-                regulator-name = "fixed-1.8V";
-                regulator-min-microvolt = <1800000>;
-                regulator-max-microvolt = <1800000>;
-                regulator-boot-on;
-                regulator-always-on;
-        };
+	reg_1p8v: regulator-1p8v {
+		compatible = "regulator-fixed";
+		regulator-name = "fixed-1.8V";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
 
-        reg_3p3v: regulator-3p3v {
-                compatible = "regulator-fixed";
-                regulator-name = "fixed-3.3V";
-                regulator-min-microvolt = <3300000>;
-                regulator-max-microvolt = <3300000>;
-                regulator-boot-on;
-                regulator-always-on;
-        };
+	reg_3p3v: regulator-3p3v {
+		compatible = "regulator-fixed";
+		regulator-name = "fixed-3.3V";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
 
 	reg_5v: regulator-5v {
 		compatible = "regulator-fixed";
@@ -81,13 +81,13 @@
 	};
 
 	usb_vbus: regulator-usb-vbus {
-                compatible = "regulator-fixed";
-                regulator-name = "usb_vbus";
-                regulator-min-microvolt = <5000000>;
-                regulator-max-microvolt = <5000000>;
-                gpios = <&pio 20 GPIO_ACTIVE_LOW>;
-                regulator-boot-on;
-        };
+		compatible = "regulator-fixed";
+		regulator-name = "usb_vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpios = <&pio 20 GPIO_ACTIVE_LOW>;
+		regulator-boot-on;
+	};
 
 	sound {
 		compatible = "mediatek,mt7986-wm8960-machine";
@@ -151,57 +151,6 @@
 &watchdog {
 	status = "okay";
 };
-
-&cpu_thermal {
-	trips {
-		cpu_trip_critical: critical {
-			temperature = <95000>;
-			hysteresis = <2000>;
-			type = "critical";
-		};
-
-		cpu_trip_hot: hot {
-			temperature = <40000>;
-			hysteresis = <2000>;
-			type = "hot";
-		};
-
-		cpu_trip_active: active {
-			temperature = <35000>;
-			hysteresis = <2000>;
-			type = "active";
-		};
-
-		cpu_trip_passive: passive {
-			temperature = <20000>;
-			hysteresis = <2000>;
-			type = "passive";
-		};
-	};
-
-	cooling-maps {
-		cpu-active-high {
-			cooling-device = <&fan 3 3>;
-			trip = <&cpu_trip_critical>;
-		};
-
-		cpu-active-low {
-			cooling-device = <&fan 2 2>;
-			trip = <&cpu_trip_hot>;
-		};
-
-		cpu-active {
-			cooling-device = <&fan 1 1>;
-			trip = <&cpu_trip_active>;
-		};
-
-		cpu-passive {
-			cooling-device = <&fan 0 0>;
-			trip = <&cpu_trip_passive>;
-		};
-	};
-};
-
 
 &eth {
 	status = "okay";
@@ -319,7 +268,7 @@
 &xhci {
         pinctrl-names = "default";
         pinctrl-0 = <&usb_ngff_pins>;
-	vusb33-supply = <&reg_3p3v>;
+		vusb33-supply = <&reg_3p3v>;
         vbus-supply = <&usb_vbus>;
         status = "okay";
 };
@@ -409,63 +358,63 @@
 		output-low;
 	};
 
-        mmc0_pins_default: mmc0-pins-50-to-61-default {
-                mux {
-                        function = "flash";
-                        groups = "emmc_51";
-                };
-                conf-cmd-dat {
-                        pins = "EMMC_DATA_0", "EMMC_DATA_1", "EMMC_DATA_2",
-                               "EMMC_DATA_3", "EMMC_DATA_4", "EMMC_DATA_5",
-                               "EMMC_DATA_6", "EMMC_DATA_7", "EMMC_CMD";
-                        input-enable;
-                        drive-strength = <MTK_DRIVE_4mA>;
-                        mediatek,pull-up-adv = <1>;     /* pull-up 10K */
-                };
-                conf-clk {
-                        pins = "EMMC_CK";
-                        drive-strength = <MTK_DRIVE_6mA>;
-                        mediatek,pull-down-adv = <2>;   /* pull-down 50K */
-                };
-                conf-ds {
-                        pins = "EMMC_DSL";
-                        mediatek,pull-down-adv = <2>;   /* pull-down 50K */
-                };
-                conf-rst {
-                        pins = "EMMC_RSTB";
-                        drive-strength = <MTK_DRIVE_4mA>;
-                        mediatek,pull-up-adv = <1>;     /* pull-up 10K */
-                };
-        };
+	mmc0_pins_default: mmc0-pins-50-to-61-default {
+		mux {
+				function = "flash";
+				groups = "emmc_51";
+		};
+		conf-cmd-dat {
+				pins = "EMMC_DATA_0", "EMMC_DATA_1", "EMMC_DATA_2",
+						"EMMC_DATA_3", "EMMC_DATA_4", "EMMC_DATA_5",
+						"EMMC_DATA_6", "EMMC_DATA_7", "EMMC_CMD";
+				input-enable;
+				drive-strength = <MTK_DRIVE_4mA>;
+				mediatek,pull-up-adv = <1>;     /* pull-up 10K */
+		};
+		conf-clk {
+				pins = "EMMC_CK";
+				drive-strength = <MTK_DRIVE_6mA>;
+				mediatek,pull-down-adv = <2>;   /* pull-down 50K */
+		};
+		conf-ds {
+				pins = "EMMC_DSL";
+				mediatek,pull-down-adv = <2>;   /* pull-down 50K */
+		};
+		conf-rst {
+				pins = "EMMC_RSTB";
+				drive-strength = <MTK_DRIVE_4mA>;
+				mediatek,pull-up-adv = <1>;     /* pull-up 10K */
+		};
+	};
 
-        mmc0_pins_uhs: mmc0-pins-50-to-61-uhs {
-                mux {
-                        function = "flash";
-                        groups = "emmc_51";
-                };
-                conf-cmd-dat {
-                        pins = "EMMC_DATA_0", "EMMC_DATA_1", "EMMC_DATA_2",
-                               "EMMC_DATA_3", "EMMC_DATA_4", "EMMC_DATA_5",
-                               "EMMC_DATA_6", "EMMC_DATA_7", "EMMC_CMD";
-                        input-enable;
-                        drive-strength = <MTK_DRIVE_4mA>;
-                        mediatek,pull-up-adv = <1>;     /* pull-up 10K */
-                };
-                conf-clk {
-                        pins = "EMMC_CK";
-                        drive-strength = <MTK_DRIVE_6mA>;
-                        mediatek,pull-down-adv = <2>;   /* pull-down 50K */
-                };
-                conf-ds {
-                        pins = "EMMC_DSL";
-                        mediatek,pull-down-adv = <2>;   /* pull-down 50K */
-                };
-                conf-rst {
-                        pins = "EMMC_RSTB";
-                        drive-strength = <MTK_DRIVE_4mA>;
-                        mediatek,pull-up-adv = <1>;     /* pull-up 10K */
-                };
-        };
+	mmc0_pins_uhs: mmc0-pins-50-to-61-uhs {
+		mux {
+				function = "flash";
+				groups = "emmc_51";
+		};
+		conf-cmd-dat {
+				pins = "EMMC_DATA_0", "EMMC_DATA_1", "EMMC_DATA_2",
+						"EMMC_DATA_3", "EMMC_DATA_4", "EMMC_DATA_5",
+						"EMMC_DATA_6", "EMMC_DATA_7", "EMMC_CMD";
+				input-enable;
+				drive-strength = <MTK_DRIVE_4mA>;
+				mediatek,pull-up-adv = <1>;     /* pull-up 10K */
+		};
+		conf-clk {
+				pins = "EMMC_CK";
+				drive-strength = <MTK_DRIVE_6mA>;
+				mediatek,pull-down-adv = <2>;   /* pull-down 50K */
+		};
+		conf-ds {
+				pins = "EMMC_DSL";
+				mediatek,pull-down-adv = <2>;   /* pull-down 50K */
+		};
+		conf-rst {
+				pins = "EMMC_RSTB";
+				drive-strength = <MTK_DRIVE_4mA>;
+				mediatek,pull-up-adv = <1>;     /* pull-up 10K */
+		};
+	};
 
 	spi_flash_pins: spi-flash-pins-33-to-38 {
 		mux {
@@ -519,9 +468,4 @@
 			drive-strength = <MTK_DRIVE_4mA>;
 		};
 	};
-};
-
-&xhci {
-	  
-	status = "okay";
 };
