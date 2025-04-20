@@ -13,6 +13,15 @@ xiaomi,redmi-router-ax6000*)
 	ucidef_set_led_default "status" "status" "rgb:status" "1"
 	ucidef_set_led_netdev "wan" "wan" "rgb:network" "wan"
 	;;
+bananapi,bpi-r3mini*)
+	ucidef_set_led_netdev "lan1" "LAN" "mdio-bus:0e:green:lan" "eth0" "link_2500 link_1000 tx rx"
+	ucidef_set_led_netdev "lan2" "LAN" "mdio-bus:0e:yellow:lan" "eth0" "link_2500 link_100 tx rx"
+	ucidef_set_led_netdev "wan1" "WAN" "mdio-bus:0f:green:wan" "eth1" "link_2500 link_1000 tx rx"
+	ucidef_set_led_netdev "wan2" "WAN" "mdio-bus:0f:yellow:wan" "eth1" "link_2500 link_100 tx rx"
+	ucidef_set_led_default "status" "STATUS" "r3mini:green" "1"
+	ucidef_set_led_netdev "wlan2g" "WLAN2G" "r3mini:blue1" "ra0"
+	ucidef_set_led_netdev "wlan5g" "WLAN5G" "r3mini:blue2" "rax0"
+	;;
 esac
 
 board_config_flush
