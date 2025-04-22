@@ -1,14 +1,21 @@
 #!/bin/sh
 #
 # Copyright (C) 2023, hanwckf <hanwckf@vip.qq.com>
+# Copyright (C) 2025, SuperKali <hello@superkali.me>
 #
 
 append DRIVERS "mtwifi"
+
+generate_random() {
+    tr -dc 'A-Z0-9' </dev/urandom | head -c6
+}
+
 
 detect_mtwifi() {
 	local idx ifname
 	local band hwmode htmode htbsscoex ssid dbdc_main channel
 	if [ -d "/sys/module/mt_wifi" ]; then
+		RANDOM_PART=$(generate_random)
 		dev_list="$(l1util list)"
 		for dev in $dev_list; do
 			config_get type ${dev} type
@@ -20,7 +27,7 @@ detect_mtwifi() {
 					hwmode="11g"
 					htmode="HE40"
 					htbsscoex="1"
-					ssid="ImmortalWrt-2.4G"
+					ssid="BananaWRT-2.4G_${RANDOM_PART}"
 					dbdc_main="1"
 					txpower="100"
 					channel="auto"
@@ -29,8 +36,8 @@ detect_mtwifi() {
 					hwmode="11a"
 					htmode="HE160"
 					htbsscoex="0"
-					ssid="ImmortalWrt-5G"
-					channel="36"
+					ssid="BananaWRT-5G_${RANDOM_PART}"
+					channel="auto"
 					txpower="100"
 					dbdc_main="0"
 				fi
@@ -44,7 +51,7 @@ detect_mtwifi() {
 					set wireless.${dev}.channel=${channel}
 					set wireless.${dev}.txpower=${txpower}
 					set wireless.${dev}.htmode=${htmode}
-					set wireless.${dev}.country=CN
+					set wireless.${dev}.country=IT
 					set wireless.${dev}.mu_beamformer=1
 					set wireless.${dev}.noscan=${htbsscoex}
 					set wireless.${dev}.serialize=1
@@ -61,4 +68,3 @@ EOF
 		done
 	fi
 }
-
