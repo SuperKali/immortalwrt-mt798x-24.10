@@ -344,7 +344,9 @@ generic_rndis_bind(struct usbnet *dev, struct usb_interface *intf, int flags)
 
 	//dev->rx_urb_size = dev->hard_mtu + (dev->maxpacket + 1);
 	//dev->rx_urb_size &= ~(dev->maxpacket - 1);
-	dev->rx_urb_size = 32*1024;
+	
+	// Temporary downscaled from 32kb to 16kb for testing stability of rndis driver
+	dev->rx_urb_size = 16*1024;
 
 	u.init->max_transfer_size = cpu_to_le32(dev->rx_urb_size);
 

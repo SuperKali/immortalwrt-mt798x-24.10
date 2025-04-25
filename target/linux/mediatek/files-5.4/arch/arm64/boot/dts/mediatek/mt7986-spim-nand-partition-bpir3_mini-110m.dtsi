@@ -8,6 +8,10 @@
 		lower-mtd-device = <&spi_nand>;
 		forced-create;
 
+		mode = "normal";
+        refresh-on-init;
+        skip-bb-scan;
+
 		partitions {
 			compatible = "fixed-partitions";
 			#address-cells = <1>;
