@@ -88,22 +88,11 @@
 		gpios = <&pio 20 GPIO_ACTIVE_LOW>;
 		regulator-boot-on;
 	};
-
-	sound {
-		compatible = "mediatek,mt7986-wm8960-machine";
-		mediatek,platform = <&afe>;
-		audio-routing = "Headphone", "HP_L",
-				"Headphone", "HP_R",
-				"LINPUT1", "AMIC",
-				"RINPUT1", "AMIC";
-		mediatek,audio-codec = <&wm8960>;
-		status = "okay";
-	};
 };
 
 &pwm {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pwm0_pin &pwm1_pin_g1>;
+	pinctrl-0 = <&pwm_pins>;
 	status = "okay";
 };
 
@@ -466,6 +455,12 @@
 			       "WF1_HB5", "WF1_HB6", "WF1_HB7", "WF1_HB8",
 			       "WF1_TOP_CLK", "WF1_TOP_DATA";
 			drive-strength = <MTK_DRIVE_4mA>;
+		};
+	};
+	pwm_pins: pwm-pins {
+		mux {
+			function = "pwm";
+			groups = "pwm0", "pwm1_0";
 		};
 	};
 };
