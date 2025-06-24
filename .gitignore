@@ -2,7 +2,7 @@
 .DS_Store
 .*.swp
 /env
-/dl
+/dl/*
 /.config
 /.config.old
 /.toolchain_build_ver
@@ -35,3 +35,7 @@ git-src
 .cproject
 .ccache
 .vscode*
+
+!/dl/datconf*
+!/dl/mt79*
+!/dl/warp*
