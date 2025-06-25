@@ -138,13 +138,9 @@
 		compatible = "mediatek,eth-mac";
 		reg = <0>;
 		phy-mode = "2500base-x";
+		phy-handle = <&phy15>;
 		nvmem-cell-names = "mac-address";
 		nvmem-cells = <&macaddr_factory_24>;
-		fixed-link {
-                        speed = <2500>;
-                        full-duplex;
-                        paus;
-                };
 	};
 
 	gmac1: mac@1 {
@@ -160,7 +156,8 @@
 		reg = <15>;
 
 		airoha,polarity = <3>;
-
+		airoha,surge = <0>;
+		airoha,phy-handle;
 		interrupt-parent = <&pio>;
 		interrupts = <38 IRQ_TYPE_EDGE_FALLING>;
 		reset-gpios = <&pio 39 GPIO_ACTIVE_LOW>;
