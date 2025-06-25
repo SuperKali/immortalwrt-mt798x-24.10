@@ -158,8 +158,19 @@
 
 /*PPE_CAH_CTRL mask*/
 #define CAH_EN (0x1 << 0) /* RW */
+#define CAH_REQ (0x1 << 8) /* RW */
 #define CAH_X_MODE (0x1 << 9) /* RW */
+#define CAH_CMD (0x3 << 12) /* RW */
+#define CAH_DATA_SEL (0x3 << 18) /* RW */
 
+/*PPE_CAH_LINE_RW mask*/
+#define LINE_RW (0xffff << 0) /* RW */
+#define OFFSET_RW (0xff << 16) /* RW */
+/*PPE_CAH_TAG_SRH mask*/
+#define TAG_SRH (0xffff << 0) /* RW */
+#define SRH_LNUM (0x7fff << 16) /* RW */
+#define SRH_HIT (0x1 << 31) /* RW */
+#define MAX_PPE_CACHE_NUM	(128)
 /*PPE_UNB_AGE mask*/
 #define UNB_DLTA (0xff << 0) /* RW */
 #define UNB_MNP (0xffff << 16) /* RW */
@@ -710,6 +721,7 @@ struct mtk_hnat {
 	bool dscp_en;
 	bool macvlan_support;
 	spinlock_t		entry_lock;
+	spinlock_t		cah_lock;
 };
 
 struct extdev_entry {
