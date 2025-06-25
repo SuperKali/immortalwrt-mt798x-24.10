@@ -20,7 +20,7 @@ mediatek_setup_interfaces()
 	mercusys,mr80x-v3|\
 	routerich,ax3000-v1|\
 	zbtlink,zbt-z8103ax)
-		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" eth1
+		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 eth1.1234" eth1
 		;;
 	acelink,ew-7886cax)
 		ucidef_set_interface_lan "eth0" "dhcp"
@@ -37,7 +37,7 @@ mediatek_setup_interfaces()
 		;;
 	huasifei,wh3000-pro|\
 	*Airpi*)
-                ucidef_set_interfaces_lan_wan "eth1 eth0" eth2
+                ucidef_set_interfaces_lan_wan "eth1.1234 eth0 eth1" eth2
                 ;;
 	asus,rt-ax52|\
 	asus,rt-ax59u|\
@@ -108,7 +108,7 @@ mediatek_setup_interfaces()
 	glinet,gl-xe3000|\
 	openembed,som7981|\
 	openwrt,one)
-		ucidef_set_interfaces_lan_wan eth1 eth0
+		ucidef_set_interfaces_lan_wan "eth1 eth1.1234" eth0
 		;;
 	dlink,aquila-pro-ai-m30-a1|\
 	dlink,aquila-pro-ai-m60-a1)

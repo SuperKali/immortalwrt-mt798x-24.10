@@ -10,21 +10,6 @@
  obj-$(CONFIG_AMD_PHY)		+= amd.o
  obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia/
  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
---- a/drivers/net/phy/realtek/realtek_main.c	2025-06-15 22:32:46.119001496 +0800
-+++ b/drivers/net/phy/realtek/realtek_main.c	2025-06-16 22:12:54.874001854 +0800
-@@ -1329,7 +1329,11 @@
- 		return ret;
- 
- 	rtl822xb_update_interface(phydev);
--
-+	if (phydev->link != 1) {
-+		phydev->link = 1;
-+               phydev->speed = SPEED_2500;
-+               phydev->duplex = DUPLEX_FULL;
-+        }
- 	return 0;
- }
- 
 --- a/drivers/net/phy/mediatek/mtk-ge-soc.c	2025-06-15 22:32:46.110001496 +0800
 +++ b/drivers/net/phy/mediatek/mtk-ge-soc.c	2025-06-16 21:13:04.290000141 +0800
 @@ -1208,7 +1208,7 @@

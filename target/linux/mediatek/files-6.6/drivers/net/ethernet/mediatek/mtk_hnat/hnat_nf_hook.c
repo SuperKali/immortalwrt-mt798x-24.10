@@ -36,6 +36,7 @@
 extern atomic_t eth1_in_br;
 struct net_device *br_dev;
 struct net_device *eth1_dev;
+struct net_device *eth1_ppd;
 
 #define do_ge2ext_fast(dev, skb)                                               \
 	((IS_LAN(dev) || IS_WAN(dev) || IS_PPD(dev)) && \
@@ -368,6 +369,7 @@ void ppd_dev_setting(void)
 {
 	br_dev = __dev_get_by_name(&init_net, "br-lan");
         eth1_dev = __dev_get_by_name(&init_net, "eth1");
+	eth1_ppd = __dev_get_by_name(&init_net, "eth1.1234");
         atomic_set(&eth1_in_br, 0);
        		if (br_dev && eth1_dev) {
                         struct net_device *dev;
@@ -375,17 +377,26 @@ void ppd_dev_setting(void)
                         netdev_for_each_lower_dev(br_dev, dev, pos) {
                                 if (dev == eth1_dev) {
                                 atomic_set(&eth1_in_br, 1);
+				hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1");
                                 break;
                                 }
                         }
                 }
 
-		if (atomic_read(&eth1_in_br)){
-                	hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1");                        
-			}
-                else {
-                    hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");
-                    }
+		if (br_dev && eth1_ppd) {
+                        struct net_device *dev;
+                        struct list_head *pos;
+                        netdev_for_each_lower_dev(br_dev, dev, pos) {
+                                if (dev == eth1_ppd) {
+                                atomic_set(&eth1_in_br, 1);
+                               hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1.1234");
+                                break;
+                                }
+                        }
+                }
+
+		if (!atomic_read(&eth1_in_br))
+                	hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");          
 }
 
 int nf_hnat_netdevice_event(struct notifier_block *unused, unsigned long event,
