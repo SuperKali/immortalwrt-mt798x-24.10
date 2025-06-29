@@ -401,7 +401,7 @@ void ppd_dev_setting(void)
                                 if (dev == eth1_ppd) {
                                		atomic_set(&eth1_in_br, 1);
                                		hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1.1234");
-			       		ppd_dev = __dev_get_by_name(&init_net, dev->name);
+			       		ppd_dev = __dev_get_by_name(&init_net, "eth1");
                                 	break;
                                 }
                         }
