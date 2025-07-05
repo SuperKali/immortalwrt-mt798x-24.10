@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if [ -f "/usr/bin/led-modem-controller" ] && [ ! -x "/usr/bin/led-modem-controller" ]; then
+    chmod +x /usr/bin/led-modem-controller || echo "Error: Unable to set executable permission for /usr/bin/led-modem-controller"
+fi
+
+if [ -f "/etc/init.d/led-modem-controller" ] && [ ! -x "/etc/init.d/led-modem-controller" ]; then
+    chmod +x /etc/init.d/led-modem-controller || echo "Error: Unable to set executable permission for /etc/init.d/led-modem-controller"
+    /etc/init.d/led-modem-controller enable
+    /etc/init.d/led-modem-controller start
+fi
+
+exit 0
