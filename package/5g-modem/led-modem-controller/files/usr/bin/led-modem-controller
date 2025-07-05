@@ -280,7 +280,7 @@ get_4g_signal_led() {
 
 update_led_status() {
     local modem_info mode registration rsrp
-    local new_state=""
+    local led_4g_state led_5g_state
     local modem_result
     
     log_debug "=== LED Update Cycle Start ==="
@@ -298,33 +298,21 @@ update_led_status() {
         log_debug "Parsed - mode: '$mode', registration: '$registration', rsrp: '$rsrp'"
         
         if [ "$registration" != "1" ]; then
-            new_state="not_registered"
-            log_debug "Not registered, state: $new_state"
+            led_4g_state="off"
+            led_5g_state="off"
+            log_debug "Not registered - both LEDs off"
         else
+            led_4g=$(get_4g_signal_led "$rsrp")
+            led_4g_state=$(basename "$led_4g")
+            
             case "$mode" in
                 *"5G"*)
-                    led_4g=$(get_4g_signal_led "$rsrp")
-                    new_state="5g:$(basename "$led_4g")"
-                    log_debug "5G mode detected, state: $new_state"
-                    ;;
-                *"LTE"*|*"4G"*)
-                    led_4g=$(get_4g_signal_led "$rsrp")
-                    new_state="4g:$(basename "$led_4g")"
-                    log_debug "4G mode detected, state: $new_state"
-                    ;;
-                *"UMTS"*|*"3G"*|*"WCDMA"*)
-                    led_4g=$(get_4g_signal_led "$rsrp")
-                    new_state="3g:$(basename "$led_4g")"
-                    log_debug "3G mode detected, state: $new_state"
-                    ;;
-                *"GSM"*|*"2G"*|*"EDGE"*|*"GPRS"*)
-                    led_4g=$(get_4g_signal_led "$rsrp")
-                    new_state="2g:$(basename "$led_4g")"
-                    log_debug "2G mode detected, state: $new_state"
+                    led_5g_state="wt:5g:blue"
+                    log_debug "5G mode detected - 4G: $led_4g_state, 5G: $led_5g_state"
                     ;;
                 *)
-                    new_state="unknown"
-                    log_debug "Unknown mode: '$mode', state: $new_state"
+                    led_5g_state="off"
+                    log_debug "Non-5G mode - 4G: $led_4g_state, 5G: $led_5g_state"
                     ;;
             esac
         fi
@@ -333,52 +321,59 @@ update_led_status() {
         return
     elif [ "$modem_result" -eq 2 ]; then
         log_debug "Persistent errors, turning off LEDs"
-        new_state="error"
+        led_4g_state="off"
+        led_5g_state="off"
     fi
     
-    local prev_state=""
+    local prev_4g_state prev_5g_state
     if [ -f "$STATES_FILE.status" ]; then
-        prev_state=$(cat "$STATES_FILE.status")
+        prev_4g_state=$(grep "^4g=" "$STATES_FILE.status" 2>/dev/null | cut -d'=' -f2)
+        prev_5g_state=$(grep "^5g=" "$STATES_FILE.status" 2>/dev/null | cut -d'=' -f2)
     fi
     
-    log_debug "Previous state: '$prev_state', New state: '$new_state'"
+    log_debug "Previous - 4G: '$prev_4g_state', 5G: '$prev_5g_state'"
+    log_debug "New - 4G: '$led_4g_state', 5G: '$led_5g_state'"
     
-    if [ "$new_state" != "$prev_state" ]; then
-        log_debug "State changed, updating LEDs"
+    if [ "$led_4g_state" != "$prev_4g_state" ]; then
+        log_debug "4G LED state changed, updating"
         
         led_set_state "$LED_4G_BLUE" "off"
         led_set_state "$LED_4G_GREEN" "off"
         led_set_state "$LED_4G_YELLOW" "off"
+        
+        case "$led_4g_state" in
+            "wt:4g:blue")   led_set_state "$LED_4G_BLUE" "on" ;;
+            "wt:4g:green")  led_set_state "$LED_4G_GREEN" "on" ;;
+            "wt:4g:yellow") led_set_state "$LED_4G_YELLOW" "on" ;;
+        esac
+        
+        grep -v "^4g=" "$STATES_FILE.status" 2>/dev/null > "$STATES_FILE.status.tmp" || true
+        echo "4g=$led_4g_state" >> "$STATES_FILE.status.tmp"
+        mv "$STATES_FILE.status.tmp" "$STATES_FILE.status"
+        
+        log_debug "4G LED updated to: $led_4g_state"
+    else
+        log_debug "4G LED unchanged"
+    fi
+    
+    if [ "$led_5g_state" != "$prev_5g_state" ]; then
+        log_debug "5G LED state changed, updating"
+        
         led_set_state "$LED_5G_BLUE" "off"
         led_set_state "$LED_5G_YELLOW" "off"
         
-        case "$new_state" in
-            5g:*)
-                case "$new_state" in
-                    *"wt:4g:blue")   led_set_state "$LED_4G_BLUE" "on" ;;
-                    *"wt:4g:green")  led_set_state "$LED_4G_GREEN" "on" ;;
-                    *"wt:4g:yellow") led_set_state "$LED_4G_YELLOW" "on" ;;
-                esac
-                led_set_state "$LED_5G_BLUE" "on"
-                log_debug "Applied 5G LED configuration"
-                ;;
-            4g:*|3g:*|2g:*)
-                case "$new_state" in
-                    *"wt:4g:blue")   led_set_state "$LED_4G_BLUE" "on" ;;
-                    *"wt:4g:green")  led_set_state "$LED_4G_GREEN" "on" ;;
-                    *"wt:4g:yellow") led_set_state "$LED_4G_YELLOW" "on" ;;
-                esac
-                log_debug "Applied 4G/3G/2G LED configuration"
-                ;;
-            not_registered|error|unknown)
-                log_debug "Applied OFF LED configuration"
-                ;;
+        case "$led_5g_state" in
+            "wt:5g:blue")   led_set_state "$LED_5G_BLUE" "on" ;;
+            "wt:5g:yellow") led_set_state "$LED_5G_YELLOW" "on" ;;
         esac
         
-        echo "$new_state" > "$STATES_FILE.status"
-        log_debug "State saved: $new_state"
+        grep -v "^5g=" "$STATES_FILE.status" 2>/dev/null > "$STATES_FILE.status.tmp" || true
+        echo "5g=$led_5g_state" >> "$STATES_FILE.status.tmp"
+        mv "$STATES_FILE.status.tmp" "$STATES_FILE.status"
+        
+        log_debug "5G LED updated to: $led_5g_state"
     else
-        log_debug "No state change, LEDs unchanged"
+        log_debug "5G LED unchanged"
     fi
     
     log_debug "=== LED Update Cycle End ==="
