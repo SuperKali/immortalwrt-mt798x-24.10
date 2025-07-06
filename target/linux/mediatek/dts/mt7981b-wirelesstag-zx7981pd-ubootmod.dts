@@ -207,6 +207,7 @@
 		#size-cells = <1>;
 		compatible = "spi-nand";
 		reg = <0>;
+
 		spi-max-frequency = <52000000>;
 		spi-tx-bus-width = <4>;
 		spi-rx-bus-width = <4>;
@@ -217,9 +218,8 @@
 			#size-cells = <1>;
 
 			partition@0 {
-				label = "BL2";
+				label = "bl2";
 				reg = <0x00000 0x0100000>;
-				read-only;
 			};
 
 			partition@100000 {
@@ -250,14 +250,19 @@
 			};
 
 			partition@380000 {
-				label = "FIP";
+				label = "fip";
 				reg = <0x380000 0x0200000>;
-				read-only;
 			};
 
 			partition@580000 {
+				label = "woem";
+				reg = <0x580000 0x0a0000>;
+				read-only;
+			};
+
+			partition@620000 {
 				label = "ubi";
-				reg = <0x580000 0x7200000>;
+				reg = <0x620000 0x7000000>;
 				compatible = "linux,ubi";
 
 				volumes {
@@ -269,6 +274,18 @@
 						volname = "recovery";
 					};
 				};
+			};
+
+			partition@7620000 {
+				label = "wtinfo";
+				reg = <0x7620000 0x060000>;
+				read-only;
+			};
+
+			partition@7680000 {
+				label = "nvram";
+				reg = <0x7680000 0x060000>;
+				read-only;
 			};
 		};
 	};

@@ -1,6 +1,6 @@
 --- /dev/null
 +++ b/configs/mt7981_zx7981pd_defconfig
-@@ -0,0 +1,133 @@
+@@ -0,0 +1,134 @@
 +CONFIG_ARM=y
 +CONFIG_SYS_HAS_NONCACHED_MEMORY=y
 +CONFIG_POSITION_INDEPENDENT=y
@@ -13,6 +13,7 @@
 +CONFIG_TARGET_MT7981=y
 +CONFIG_PRE_CON_BUF_ADDR=0x4007EF00
 +CONFIG_RESET_BUTTON_LABEL="reset"
++CONFIG_PRE_CON_BUF_ADDR=0x4007EF00
 +CONFIG_DEBUG_UART_BASE=0x11002000
 +CONFIG_DEBUG_UART_CLOCK=40000000
 +CONFIG_SYS_LOAD_ADDR=0x46000000
@@ -136,7 +137,7 @@
 +CONFIG_LMB_MAX_REGIONS=64
 +--- /dev/null
 +++ b/arch/arm/dts/mt7981b-wirelesstag-zx7981pd-ubootmod.dts
-@@ -0,0 +1,164 @@
+@@ -0,0 +1,182 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * Copyright (C) 2024 Wireless-Tag
@@ -262,8 +263,6 @@
 +		compatible = "spi-nand";
 +		reg = <0>;
 +		spi-max-frequency = <52000000>;
-+		spi-tx-bus-width = <4>;
-+		spi-rx-bus-width = <4>;
 +
 +		partitions {
 +			compatible = "fixed-partitions";
@@ -281,8 +280,9 @@
 +			};
 +
 +			partition@180000 {
-+				label = "factory";
++				label = "Factory";
 +				reg = <0x180000 0x200000>;
++				read-only;
 +			};
 +
 +			partition@380000 {
@@ -291,8 +291,27 @@
 +			};
 +
 +			partition@580000 {
++				label = "woem";
++				reg = <0x580000 0xa0000>;
++				read-only;
++			};
++
++			partition@620000 {
 +				label = "ubi";
-+				reg = <0x580000 0x7200000>;
++				reg = <0x620000 0x7000000>;
++				compatible = "linux,ubi";
++			};
++
++			partition@7620000 {
++				label = "wtinfo";
++				reg = <0x7620000 0x60000>;
++				read-only;
++			};
++
++			partition@7680000 {
++				label = "nvram";
++				reg = <0x7680000 0x60000>;
++				read-only;
 +			};
 +		};
 +	};
@@ -303,13 +322,12 @@
 +};
 +--- /dev/null
 +++ b/zx7981pd_env
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,59 @@
 +ipaddr=192.168.1.1
 +serverip=192.168.1.254
 +loadaddr=0x46000000
 +console=earlycon=uart8250,mmio32,0x11002000 console=ttyS0
 +bootcmd=run check_buttons ; run led_start ; run boot_calibration ; run boot_production ; run boot_recovery
-+bootargs=console=ttyS0,115200n8 earlycon=uart8250,mmio32,0x11002000
 +bootconf=config-1
 +bootdelay=0
 +bootfile=immortalwrt-mediatek-filogic-wirelesstag_zx7981pd-ubootmod-initramfs-recovery.itb
