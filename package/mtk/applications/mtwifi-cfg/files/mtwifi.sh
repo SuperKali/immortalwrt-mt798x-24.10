@@ -30,7 +30,7 @@ detect_mtwifi() {
 					htmode="HE160"
 					htbsscoex="0"
 					ssid="ImmortalWrt-5G"
-					channel="36"
+					channel="auto"
 					txpower="100"
 					dbdc_main="0"
 				fi
@@ -44,7 +44,7 @@ detect_mtwifi() {
 					set wireless.${dev}.channel=${channel}
 					set wireless.${dev}.txpower=${txpower}
 					set wireless.${dev}.htmode=${htmode}
-					set wireless.${dev}.country=CN
+					set wireless.${dev}.country=IT
 					set wireless.${dev}.mu_beamformer=1
 					set wireless.${dev}.noscan=${htbsscoex}
 					set wireless.${dev}.serialize=1
