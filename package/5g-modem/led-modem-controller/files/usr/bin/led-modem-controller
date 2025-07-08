@@ -330,6 +330,12 @@ parse_json_field() {
 get_4g_signal_led() {
     local rsrp="$1"
     
+    if [ -z "$rsrp" ] || ! echo "$rsrp" | grep -q '^-\?[0-9]\+$'; then
+        log_debug "Invalid RSRP value '$rsrp', using fallback (yellow)"
+        echo "$LED_4G_YELLOW"
+        return
+    fi
+    
     rsrp=$(echo "$rsrp" | sed 's/^-//')
     
     if [ "$rsrp" -le 80 ]; then
@@ -360,11 +366,22 @@ update_led_status() {
             
             log_debug "Parsed - mode: '$mode', registration: '$registration', rsrp: '$rsrp'"
             
-            if [ "$registration" != "1" ]; then
+            if [ -z "$registration" ]; then
+                log_debug "Registration empty, keeping current LED state"
+                return
+            elif [ "$registration" != "1" ] && [ "$registration" != "0" ]; then
+                log_debug "Registration invalid value '$registration', keeping current LED state"
+                return
+            elif [ "$registration" = "0" ]; then
                 led_4g_state="off"
                 led_5g_state="off"
-                log_debug "Not registered - LEDs off"
+                log_debug "Not registered (registration=0) - LEDs off"
             else
+                if [ -z "$rsrp" ] || [ -z "$mode" ]; then
+                    log_debug "Missing mode or rsrp data, keeping current LED state"
+                    return
+                fi
+                
                 led_4g=$(get_4g_signal_led "$rsrp")
                 led_4g_state=$(basename "$led_4g")
                 
