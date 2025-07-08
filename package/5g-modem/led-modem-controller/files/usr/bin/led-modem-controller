@@ -11,6 +11,7 @@ readonly MAX_ERRORS=3
 readonly ERROR_COUNT_FILE="/tmp/led_modem_errors"
 readonly UPDATE_INTERVAL=30
 readonly MODEM_INFO_CMD="/usr/share/3ginfo-lite/3ginfo.sh"
+readonly MODEM_TIMEOUT=15
 
 readonly LED_4G_BLUE="/sys/class/leds/wt:4g:blue"
 readonly LED_4G_GREEN="/sys/class/leds/wt:4g:green"
@@ -24,23 +25,12 @@ readonly EXIT_ALREADY_RUNNING=2
 readonly EXIT_NOT_RUNNING=3
 
 cleanup() {
-    echo 0 > "$LED_4G_BLUE/brightness" 2>/dev/null
-    echo none > "$LED_4G_BLUE/trigger" 2>/dev/null
-    echo 0 > "$LED_4G_GREEN/brightness" 2>/dev/null
-    echo none > "$LED_4G_GREEN/trigger" 2>/dev/null
-    echo 0 > "$LED_4G_YELLOW/brightness" 2>/dev/null
-    echo none > "$LED_4G_YELLOW/trigger" 2>/dev/null
-    echo 0 > "$LED_5G_BLUE/brightness" 2>/dev/null
-    echo none > "$LED_5G_BLUE/trigger" 2>/dev/null
-    echo 0 > "$LED_5G_YELLOW/brightness" 2>/dev/null
-    echo none > "$LED_5G_YELLOW/trigger" 2>/dev/null
+    for led in "$LED_4G_BLUE" "$LED_4G_GREEN" "$LED_4G_YELLOW" "$LED_5G_BLUE" "$LED_5G_YELLOW"; do
+        echo 0 > "$led/brightness" 2>/dev/null || true
+        echo none > "$led/trigger" 2>/dev/null || true
+    done
     
-    [ -f "$PID_FILE" ] && rm -f "$PID_FILE"
-    [ -f "$STATES_FILE" ] && rm -f "$STATES_FILE"
-    [ -f "$STATES_FILE.status" ] && rm -f "$STATES_FILE.status"
-    [ -f "$CACHE_FILE" ] && rm -f "$CACHE_FILE"
-    [ -f "$ERROR_COUNT_FILE" ] && rm -f "$ERROR_COUNT_FILE"
-    [ -f "/tmp/led_debug.log" ] && rm -f "/tmp/led_debug.log"
+    rm -f "$PID_FILE" "$STATES_FILE" "$STATES_FILE.status" "$CACHE_FILE" "$ERROR_COUNT_FILE" "/tmp/led_debug.log"
     exit $EXIT_SUCCESS
 }
 
@@ -61,7 +51,28 @@ log_info() {
 }
 
 is_daemon_running() {
-    [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null
+    [ -f "$PID_FILE" ] || return 1
+    
+    local pid
+    pid=$(cat "$PID_FILE" 2>/dev/null) || return 1
+    
+    [ -n "$pid" ] && [ "$pid" -eq "$pid" ] 2>/dev/null || {
+        rm -f "$PID_FILE"
+        return 1
+    }
+    
+    if kill -0 "$pid" 2>/dev/null; then
+        if [ -f "/proc/$pid/cmdline" ]; then
+            grep -q "led-modem-controller" "/proc/$pid/cmdline" 2>/dev/null || {
+                rm -f "$PID_FILE"
+                return 1
+            }
+        fi
+        return 0
+    else
+        rm -f "$PID_FILE"
+        return 1
+    fi
 }
 
 create_pid_file() {
@@ -69,16 +80,16 @@ create_pid_file() {
 }
 
 validate_environment() {
-    if [ ! -x "$MODEM_INFO_CMD" ]; then
+    [ -x "$MODEM_INFO_CMD" ] || {
         log_error "Modem info command not found: $MODEM_INFO_CMD"
         return $EXIT_ERROR
-    fi
+    }
     
-    for led_path in "$LED_4G_BLUE" "$LED_4G_GREEN" "$LED_4G_YELLOW" "$LED_5G_BLUE" "$LED_5G_YELLOW"; do
-        if [ ! -d "$led_path" ]; then
-            log_error "LED path not found: $led_path"
+    for led in "$LED_4G_BLUE" "$LED_4G_GREEN" "$LED_4G_YELLOW" "$LED_5G_BLUE" "$LED_5G_YELLOW"; do
+        [ -d "$led" ] || {
+            log_error "LED path not found: $led"
             return $EXIT_ERROR
-        fi
+        }
     done
     
     return $EXIT_SUCCESS
@@ -87,34 +98,33 @@ validate_environment() {
 led_set_state() {
     local led_path="$1"
     local new_state="$2"
-    local current_state=""
+    local led_name current_state
     
-    if [ -f "$STATES_FILE" ]; then
-        current_state=$(grep "^$(basename "$led_path")=" "$STATES_FILE" 2>/dev/null | cut -d'=' -f2 || true)
-    fi
+    led_name=$(basename "$led_path")
+    current_state=$(grep "^$led_name=" "$STATES_FILE" 2>/dev/null | cut -d'=' -f2 || true)
     
-    if [ "$current_state" != "$new_state" ]; then
-        case "$new_state" in
-            "on")
-                if echo none > "$led_path/trigger" 2>/dev/null && echo 1 > "$led_path/brightness" 2>/dev/null; then
-                    update_state_file "$(basename "$led_path")" "$new_state"
-                else
-                    log_error "Failed to turn on LED: $led_path"
-                fi
-                ;;
-            "off")
-                if echo 0 > "$led_path/brightness" 2>/dev/null && echo none > "$led_path/trigger" 2>/dev/null; then
-                    update_state_file "$(basename "$led_path")" "$new_state"
-                else
-                    log_error "Failed to turn off LED: $led_path"
-                fi
-                ;;
-            *)
-                log_error "Invalid LED state: $new_state"
-                return $EXIT_ERROR
-                ;;
-        esac
-    fi
+    [ "$current_state" = "$new_state" ] && return
+    
+    case "$new_state" in
+        "on")
+            if echo none > "$led_path/trigger" 2>/dev/null && echo 1 > "$led_path/brightness" 2>/dev/null; then
+                update_state_file "$led_name" "$new_state"
+            else
+                log_error "Failed to turn on LED: $led_path"
+            fi
+            ;;
+        "off")
+            if echo 0 > "$led_path/brightness" 2>/dev/null && echo none > "$led_path/trigger" 2>/dev/null; then
+                update_state_file "$led_name" "$new_state"
+            else
+                log_error "Failed to turn off LED: $led_path"
+            fi
+            ;;
+        *)
+            log_error "Invalid LED state: $new_state"
+            return $EXIT_ERROR
+            ;;
+    esac
 }
 
 update_state_file() {
@@ -123,7 +133,7 @@ update_state_file() {
     local temp_file="$STATES_FILE.tmp"
     
     if [ -f "$STATES_FILE" ]; then
-        grep -v "^$led_name=" "$STATES_FILE" > "$temp_file" 2>/dev/null || true
+        grep -v "^$led_name=" "$STATES_FILE" > "$temp_file" 2>/dev/null || touch "$temp_file"
     else
         touch "$temp_file"
     fi
@@ -133,41 +143,36 @@ update_state_file() {
 }
 
 get_cached_data() {
-    if [ -f "$CACHE_FILE" ]; then
-        local cache_time=$(head -n1 "$CACHE_FILE" 2>/dev/null)
-        local current_time=$(date +%s)
-        
-        if [ -z "$cache_time" ] || ! [ "$cache_time" -eq "$cache_time" ] 2>/dev/null; then
-            log_debug "Invalid cache timestamp: '$cache_time'"
-            return 1
-        fi
-        
-        local age=$((current_time - cache_time))
-        log_debug "Cache age: ${age}s (max: ${CACHE_TIMEOUT}s)"
-        
-        if [ "$age" -lt "$CACHE_TIMEOUT" ]; then
-            local cached_data=$(tail -n+2 "$CACHE_FILE" 2>/dev/null)
-            if [ -n "$cached_data" ]; then
-                log_debug "Using valid cache data"
-                echo "$cached_data"
-                return 0
-            else
-                log_debug "Cache file exists but no data"
-                return 1
-            fi
-        else
-            log_debug "Cache expired (age: ${age}s)"
-            return 1
-        fi
-    else
-        log_debug "No cache file exists"
+    [ -f "$CACHE_FILE" ] || return 1
+    
+    local cache_time current_time age cached_data
+    cache_time=$(head -n1 "$CACHE_FILE" 2>/dev/null) || return 1
+    current_time=$(date +%s)
+    
+    [ -n "$cache_time" ] && [ "$cache_time" -eq "$cache_time" ] 2>/dev/null || {
+        log_debug "Invalid cache timestamp"
         return 1
+    }
+    
+    age=$((current_time - cache_time))
+    log_debug "Cache age: ${age}s"
+    
+    if [ "$age" -lt "$CACHE_TIMEOUT" ]; then
+        cached_data=$(tail -n+2 "$CACHE_FILE" 2>/dev/null)
+        if [ -n "$cached_data" ]; then
+            log_debug "Using cached data"
+            echo "$cached_data"
+            return 0
+        fi
     fi
+    
+    return 1
 }
 
 save_to_cache() {
     local data="$1"
-    local current_time=$(date +%s)
+    local current_time
+    current_time=$(date +%s)
     
     {
         echo "$current_time"
@@ -176,81 +181,141 @@ save_to_cache() {
 }
 
 get_error_count() {
-    if [ -f "$ERROR_COUNT_FILE" ]; then
-        cat "$ERROR_COUNT_FILE"
-    else
-        echo "0"
-    fi
+    [ -f "$ERROR_COUNT_FILE" ] && cat "$ERROR_COUNT_FILE" || echo "0"
 }
 
 increment_error_count() {
-    local count=$(get_error_count)
-    count=$((count + 1))
-    echo "$count" > "$ERROR_COUNT_FILE"
+    local count
+    count=$(get_error_count)
+    echo $((count + 1)) > "$ERROR_COUNT_FILE"
 }
 
 reset_error_count() {
-    [ -f "$ERROR_COUNT_FILE" ] && rm -f "$ERROR_COUNT_FILE"
+    rm -f "$ERROR_COUNT_FILE"
+}
+
+run_with_timeout() {
+    local timeout="$1"
+    local cmd="$2"
+    local temp_file="/tmp/modem_cmd_$$"
+    local pid_file="/tmp/modem_pid_$$"
+    local count=0
+    
+    log_debug "Running command with ${timeout}s timeout"
+    
+    ($cmd > "$temp_file" 2>&1; echo $? > "${temp_file}.exit") &
+    echo $! > "$pid_file"
+    
+    while [ $count -lt $timeout ]; do
+        [ -f "$pid_file" ] && kill -0 "$(cat "$pid_file")" 2>/dev/null || break
+        sleep 1
+        count=$((count + 1))
+    done
+    
+    if [ -f "$pid_file" ] && kill -0 "$(cat "$pid_file")" 2>/dev/null; then
+        log_debug "Command timed out, terminating"
+        kill -TERM "$(cat "$pid_file")" 2>/dev/null
+        sleep 2
+        [ -f "$pid_file" ] && kill -0 "$(cat "$pid_file")" 2>/dev/null && kill -KILL "$(cat "$pid_file")" 2>/dev/null
+        rm -f "$temp_file" "${temp_file}.exit" "$pid_file"
+        return 124
+    fi
+    
+    if [ -f "${temp_file}.exit" ]; then
+        local exit_code
+        exit_code=$(cat "${temp_file}.exit")
+        if [ "$exit_code" -eq 0 ] && [ -f "$temp_file" ]; then
+            cat "$temp_file"
+            rm -f "$temp_file" "${temp_file}.exit" "$pid_file"
+            return 0
+        fi
+    fi
+    
+    rm -f "$temp_file" "${temp_file}.exit" "$pid_file"
+    return 1
+}
+
+wait_for_modem() {
+    local max_wait=60
+    local count=0
+    
+    log_debug "Waiting for modem devices..."
+    
+    while [ $count -lt $max_wait ]; do
+        for device in "/dev/ttyUSB0" "/dev/ttyUSB1" "/dev/ttyUSB2" "/dev/cdc-wdm0"; do
+            if [ -e "$device" ]; then
+                log_debug "Modem device found: $device"
+                sleep 2
+                return 0
+            fi
+        done
+        sleep 1
+        count=$((count + 1))
+    done
+    
+    log_debug "No modem devices found"
+    return 1
 }
 
 get_modem_info() {
-    local info
+    local info result error_count
     
     log_debug "Attempting to get modem info..."
     
-    if info=$("$MODEM_INFO_CMD" 2>/dev/null) && [ -n "$info" ]; then
-        log_debug "3ginfo command successful, data length: ${#info}"
+    if ! wait_for_modem; then
+        log_debug "Modem not ready"
+        increment_error_count
+        error_count=$(get_error_count)
         
+        if get_cached_data; then
+            [ "$error_count" -lt "$MAX_ERRORS" ] && return 0 || return 2
+        else
+            [ "$error_count" -lt "$MAX_ERRORS" ] && return 1 || return 2
+        fi
+    fi
+    
+    info=$(run_with_timeout "$MODEM_TIMEOUT" "$MODEM_INFO_CMD")
+    result=$?
+    
+    log_debug "Command result: $result, data length: ${#info}"
+    
+    if [ $result -eq 0 ] && [ -n "$info" ]; then
         if echo "$info" | grep -q '"error"'; then
-            log_debug "3ginfo returned error in JSON"
+            log_debug "JSON contains error"
             increment_error_count
-            local error_count=$(get_error_count)
+            error_count=$(get_error_count)
             
             if get_cached_data; then
-                if [ "$error_count" -lt "$MAX_ERRORS" ]; then
-                    log_info "3ginfo error but using cache (error $error_count/$MAX_ERRORS)"
-                    return 0
-                else
-                    log_error "3ginfo error and too many errors ($error_count)"
-                    return 2
-                fi
+                [ "$error_count" -lt "$MAX_ERRORS" ] && return 0 || return 2
             else
-                if [ "$error_count" -lt "$MAX_ERRORS" ]; then
-                    log_info "3ginfo error, no cache, keeping LED state (error $error_count/$MAX_ERRORS)"
-                    return 1
-                else
-                    log_error "3ginfo error, no cache, too many errors ($error_count)"
-                    return 2
-                fi
+                [ "$error_count" -lt "$MAX_ERRORS" ] && return 1 || return 2
             fi
         else
             save_to_cache "$info"
             reset_error_count
-            log_debug "3ginfo success, cache updated"
+            log_debug "Command successful"
             echo "$info"
             return 0
         fi
-    else
-        log_debug "3ginfo command failed or empty response"
+    elif [ $result -eq 124 ]; then
+        log_debug "Command timed out"
         increment_error_count
-        local error_count=$(get_error_count)
+        error_count=$(get_error_count)
         
         if get_cached_data; then
-            if [ "$error_count" -lt "$MAX_ERRORS" ]; then
-                log_info "3ginfo failed but using cache (error $error_count/$MAX_ERRORS)"
-                return 0
-            else
-                log_error "3ginfo failed and too many errors ($error_count)"
-                return 2
-            fi
+            [ "$error_count" -lt "$MAX_ERRORS" ] && return 0 || return 2
         else
-            if [ "$error_count" -lt "$MAX_ERRORS" ]; then
-                log_info "3ginfo failed, no cache, keeping LED state (error $error_count/$MAX_ERRORS)"
-                return 1
-            else
-                log_error "3ginfo failed, no cache, too many errors ($error_count)"
-                return 2
-            fi
+            [ "$error_count" -lt "$MAX_ERRORS" ] && return 1 || return 2
+        fi
+    else
+        log_debug "Command failed"
+        increment_error_count
+        error_count=$(get_error_count)
+        
+        if get_cached_data; then
+            [ "$error_count" -lt "$MAX_ERRORS" ] && return 0 || return 2
+        else
+            [ "$error_count" -lt "$MAX_ERRORS" ] && return 1 || return 2
         fi
     fi
 }
@@ -271,17 +336,14 @@ get_4g_signal_led() {
         echo "$LED_4G_BLUE"
     elif [ "$rsrp" -le 89 ]; then
         echo "$LED_4G_GREEN"
-    elif [ "$rsrp" -le 100 ]; then
-        echo "$LED_4G_YELLOW"
     else
         echo "$LED_4G_YELLOW"
     fi
 }
 
 update_led_status() {
-    local modem_info mode registration rsrp
-    local led_4g_state led_5g_state
-    local modem_result
+    local modem_info mode registration rsrp led_4g led_4g_state led_5g_state
+    local prev_4g_state prev_5g_state modem_result
     
     log_debug "=== LED Update Cycle Start ==="
     
@@ -290,90 +352,85 @@ update_led_status() {
     
     log_debug "get_modem_info result: $modem_result"
     
-    if [ "$modem_result" -eq 0 ]; then
-        mode=$(parse_json_field "$modem_info" "mode")
-        registration=$(parse_json_field "$modem_info" "registration")
-        rsrp=$(parse_json_field "$modem_info" "rsrp")
-        
-        log_debug "Parsed - mode: '$mode', registration: '$registration', rsrp: '$rsrp'"
-        
-        if [ "$registration" != "1" ]; then
+    case $modem_result in
+        0)
+            mode=$(parse_json_field "$modem_info" "mode")
+            registration=$(parse_json_field "$modem_info" "registration")
+            rsrp=$(parse_json_field "$modem_info" "rsrp")
+            
+            log_debug "Parsed - mode: '$mode', registration: '$registration', rsrp: '$rsrp'"
+            
+            if [ "$registration" != "1" ]; then
+                led_4g_state="off"
+                led_5g_state="off"
+                log_debug "Not registered - LEDs off"
+            else
+                led_4g=$(get_4g_signal_led "$rsrp")
+                led_4g_state=$(basename "$led_4g")
+                
+                case "$mode" in
+                    *"5G"*)
+                        led_5g_state="wt:5g:blue"
+                        log_debug "5G mode - 4G: $led_4g_state, 5G: blue"
+                        ;;
+                    *)
+                        led_5g_state="off"
+                        log_debug "Non-5G mode - 4G: $led_4g_state, 5G: off"
+                        ;;
+                esac
+            fi
+            ;;
+        1)
+            log_debug "Temporary error, keeping current state"
+            return
+            ;;
+        2)
+            log_debug "Persistent errors, turning off LEDs"
             led_4g_state="off"
             led_5g_state="off"
-            log_debug "Not registered - both LEDs off"
-        else
-            led_4g=$(get_4g_signal_led "$rsrp")
-            led_4g_state=$(basename "$led_4g")
-            
-            case "$mode" in
-                *"5G"*)
-                    led_5g_state="wt:5g:blue"
-                    log_debug "5G mode detected - 4G: $led_4g_state, 5G: $led_5g_state"
-                    ;;
-                *)
-                    led_5g_state="off"
-                    log_debug "Non-5G mode - 4G: $led_4g_state, 5G: $led_5g_state"
-                    ;;
-            esac
-        fi
-    elif [ "$modem_result" -eq 1 ]; then
-        log_debug "Temporary error, keeping current LED state"
-        return
-    elif [ "$modem_result" -eq 2 ]; then
-        log_debug "Persistent errors, turning off LEDs"
-        led_4g_state="off"
-        led_5g_state="off"
-    fi
+            ;;
+    esac
     
-    local prev_4g_state prev_5g_state
     if [ -f "$STATES_FILE.status" ]; then
         prev_4g_state=$(grep "^4g=" "$STATES_FILE.status" 2>/dev/null | cut -d'=' -f2)
         prev_5g_state=$(grep "^5g=" "$STATES_FILE.status" 2>/dev/null | cut -d'=' -f2)
     fi
     
-    log_debug "Previous - 4G: '$prev_4g_state', 5G: '$prev_5g_state'"
-    log_debug "New - 4G: '$led_4g_state', 5G: '$led_5g_state'"
+    log_debug "States - 4G: '$prev_4g_state' -> '$led_4g_state', 5G: '$prev_5g_state' -> '$led_5g_state'"
     
     if [ "$led_4g_state" != "$prev_4g_state" ]; then
-        log_debug "4G LED state changed, updating"
-        
-        led_set_state "$LED_4G_BLUE" "off"
-        led_set_state "$LED_4G_GREEN" "off"
-        led_set_state "$LED_4G_YELLOW" "off"
+        for led in "$LED_4G_BLUE" "$LED_4G_GREEN" "$LED_4G_YELLOW"; do
+            led_set_state "$led" "off"
+        done
         
         case "$led_4g_state" in
-            "wt:4g:blue")   led_set_state "$LED_4G_BLUE" "on" ;;
-            "wt:4g:green")  led_set_state "$LED_4G_GREEN" "on" ;;
+            "wt:4g:blue") led_set_state "$LED_4G_BLUE" "on" ;;
+            "wt:4g:green") led_set_state "$LED_4G_GREEN" "on" ;;
             "wt:4g:yellow") led_set_state "$LED_4G_YELLOW" "on" ;;
         esac
         
-        grep -v "^4g=" "$STATES_FILE.status" 2>/dev/null > "$STATES_FILE.status.tmp" || true
+        grep -v "^4g=" "$STATES_FILE.status" 2>/dev/null > "$STATES_FILE.status.tmp" || touch "$STATES_FILE.status.tmp"
         echo "4g=$led_4g_state" >> "$STATES_FILE.status.tmp"
         mv "$STATES_FILE.status.tmp" "$STATES_FILE.status"
         
         log_debug "4G LED updated to: $led_4g_state"
-    else
-        log_debug "4G LED unchanged"
     fi
     
     if [ "$led_5g_state" != "$prev_5g_state" ]; then
-        log_debug "5G LED state changed, updating"
-        
-        led_set_state "$LED_5G_BLUE" "off"
-        led_set_state "$LED_5G_YELLOW" "off"
+        for led in "$LED_5G_BLUE" "$LED_5G_YELLOW"; do
+            led_set_state "$led" "off"
+        done
         
         case "$led_5g_state" in
-            "wt:5g:blue")   led_set_state "$LED_5G_BLUE" "on" ;;
+            "wt:5g:blue") led_set_state "$LED_5G_BLUE" "on" ;;
             "wt:5g:yellow") led_set_state "$LED_5G_YELLOW" "on" ;;
         esac
         
-        grep -v "^5g=" "$STATES_FILE.status" 2>/dev/null > "$STATES_FILE.status.tmp" || true
+        grep -v "^5g=" "$STATES_FILE.status" 2>/dev/null > "$STATES_FILE.status.tmp" || touch "$STATES_FILE.status.tmp"
         echo "5g=$led_5g_state" >> "$STATES_FILE.status.tmp"
         mv "$STATES_FILE.status.tmp" "$STATES_FILE.status"
         
         log_debug "5G LED updated to: $led_5g_state"
-    else
-        log_debug "5G LED unchanged"
     fi
     
     log_debug "=== LED Update Cycle End ==="
@@ -381,19 +438,36 @@ update_led_status() {
 
 start_daemon() {
     if is_daemon_running; then
-        log_error "Daemon already running (PID: $(cat "$PID_FILE"))"
+        log_error "Daemon already running"
         return $EXIT_ALREADY_RUNNING
     fi
     
-    if ! validate_environment; then
-        return $EXIT_ERROR
-    fi
+    validate_environment || return $EXIT_ERROR
     
     create_pid_file
-    log_info "LED Modem Controller daemon started (PID: $$)"
+    log_info "LED Modem Controller daemon started"
     
     while true; do
-        update_led_status
+        log_debug "Main loop iteration"
+        
+        (update_led_status) &
+        local update_pid=$!
+        local count=0
+        local max_wait=$((UPDATE_INTERVAL + 15))
+        
+        while [ $count -lt $max_wait ]; do
+            kill -0 "$update_pid" 2>/dev/null || break
+            sleep 1
+            count=$((count + 1))
+        done
+        
+        if kill -0 "$update_pid" 2>/dev/null; then
+            log_error "LED update hung, terminating"
+            kill -TERM "$update_pid" 2>/dev/null
+            sleep 2
+            kill -0 "$update_pid" 2>/dev/null && kill -KILL "$update_pid" 2>/dev/null
+        fi
+        
         sleep "$UPDATE_INTERVAL"
     done
 }
@@ -416,46 +490,36 @@ stop_daemon() {
         
         if kill -0 "$pid" 2>/dev/null; then
             kill -KILL "$pid" 2>/dev/null
-            log_info "Daemon force killed"
+            log_info "Daemon force terminated"
         else
-            log_info "Daemon stopped gracefully"
+            log_info "Daemon stopped"
         fi
     else
         log_error "Failed to stop daemon"
         return $EXIT_ERROR
     fi
     
-    echo 0 > "$LED_4G_BLUE/brightness" 2>/dev/null
-    echo none > "$LED_4G_BLUE/trigger" 2>/dev/null
-    echo 0 > "$LED_4G_GREEN/brightness" 2>/dev/null
-    echo none > "$LED_4G_GREEN/trigger" 2>/dev/null
-    echo 0 > "$LED_4G_YELLOW/brightness" 2>/dev/null
-    echo none > "$LED_4G_YELLOW/trigger" 2>/dev/null
-    echo 0 > "$LED_5G_BLUE/brightness" 2>/dev/null
-    echo none > "$LED_5G_BLUE/trigger" 2>/dev/null
-    echo 0 > "$LED_5G_YELLOW/brightness" 2>/dev/null
-    echo none > "$LED_5G_YELLOW/trigger" 2>/dev/null
+    for led in "$LED_4G_BLUE" "$LED_4G_GREEN" "$LED_4G_YELLOW" "$LED_5G_BLUE" "$LED_5G_YELLOW"; do
+        echo 0 > "$led/brightness" 2>/dev/null || true
+        echo none > "$led/trigger" 2>/dev/null || true
+    done
     
-    [ -f "$PID_FILE" ] && rm -f "$PID_FILE"
-    [ -f "$STATES_FILE" ] && rm -f "$STATES_FILE"
-    [ -f "$STATES_FILE.status" ] && rm -f "$STATES_FILE.status"
-    [ -f "$CACHE_FILE" ] && rm -f "$CACHE_FILE"
-    [ -f "$ERROR_COUNT_FILE" ] && rm -f "$ERROR_COUNT_FILE"
+    rm -f "$PID_FILE" "$STATES_FILE" "$STATES_FILE.status" "$CACHE_FILE" "$ERROR_COUNT_FILE"
 }
 
 status_daemon() {
     if is_daemon_running; then
-        log_info "Daemon running (PID: $(cat "$PID_FILE"))"
+        log_info "Daemon is running"
         return $EXIT_SUCCESS
     else
-        log_info "Daemon not running"
+        log_info "Daemon is not running"
         return $EXIT_NOT_RUNNING
     fi
 }
 
 show_usage() {
-    cat << EOF
-Usage: $SCRIPT_NAME [COMMAND]
+    cat << 'EOF'
+Usage: led-modem-controller [COMMAND]
 
 LED Modem Controller for OpenWrt
 
@@ -466,45 +530,15 @@ COMMANDS:
     status     Show daemon status
     help       Show this help message
 
-EXAMPLES:
-    $SCRIPT_NAME start          # Start daemon
-    $SCRIPT_NAME &              # Start in background
-    $SCRIPT_NAME stop           # Stop daemon
-    $SCRIPT_NAME status         # Check status
-
 DESCRIPTION:
-    Monitors modem connection status and controls LEDs accordingly:
-    
-    4G LED (shows signal quality based on RSRP):
-    - Blue:   Very good signal (RSRP ≥ -80 dBm)
-    - Green:  Good signal (RSRP -80 to -89 dBm)
-    - Yellow: Weak/Very weak signal (RSRP ≤ -90 dBm)
-    
-    5G LED (shows connection type):
-    - Blue:   ON when any 5G mode detected (NSA/SA)
-    - OFF:    When 4G/3G/2G only
-    
-    Connection types:
-    - 5G NSA/SA: 4G LED (signal quality) + 5G LED (blue)
-    - 4G/LTE:    4G LED (signal quality) only
-    - 3G/2G:     4G LED (signal quality) only
-    - Error/Not registered/Unknown: ALL LEDs OFF
-
-    Updates every $UPDATE_INTERVAL seconds.
-    Uses 3-minute cache and 3-error tolerance for balanced real-time/stability.
-
-FILES:
-    $PID_FILE      Process ID file
-    $STATES_FILE   LED states cache
-    $CACHE_FILE    Modem data cache
+    Monitors modem connection status and controls LEDs accordingly.
+    Updates every 30 seconds with timeout and error handling.
 
 EOF
 }
 
 main() {
-    local command="${1:-start}"
-    
-    case "$command" in
+    case "${1:-start}" in
         start)
             start_daemon
             ;;
@@ -523,7 +557,7 @@ main() {
             show_usage
             ;;
         *)
-            log_error "Unknown command: $command"
+            log_error "Unknown command: $1"
             show_usage
             exit $EXIT_ERROR
             ;;
