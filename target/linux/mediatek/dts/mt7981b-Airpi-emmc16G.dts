@@ -148,8 +148,8 @@
 
 &fan {
 	interrupt-parent = <&pio>;
-	interrupts = <13 IRQ_TYPE_EDGE_FALLING>;
-	pwms = <&pwm 1 40000 0>;
+	interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
+	pwms = <&pwm 2 10000 0>;
 	status = "okay";
 };
 
@@ -176,12 +176,6 @@
 	};
 };
 
-&fan {
-	interrupt-parent = <&pio>;
-	interrupts = <7 IRQ_TYPE_EDGE_FALLING>;
-	pwms = <&pwm 2 10000 0>;
-	status = "okay";
-};
 
 &pwm {
 	pinctrl-names = "default";
