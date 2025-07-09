@@ -19,7 +19,7 @@ function modem_scan()
 	disabled_function("modem_scan",true);
 
 	//修改描述信息
-	var description='<img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>"/><%:Scaning modem...%>'
+	var description='<img src="<%=resource%>/icons/loading.svg" alt="<%:Loading%>"/><%:Scaning modem...%>'
 	document.getElementById('modem_scan_description').innerHTML=description;
 
 	XHR.get('<%=luci.dispatcher.build_url("admin", "network", "modem", "modem_scan")%>', null,
