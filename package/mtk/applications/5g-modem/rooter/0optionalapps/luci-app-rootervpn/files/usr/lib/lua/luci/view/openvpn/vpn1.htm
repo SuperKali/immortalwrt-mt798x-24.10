@@ -47,17 +47,17 @@
 				}
 				if ( rv[j-1].enabled == "0" )
 				{
-					tr.insertCell(-1).innerHTML = '<img src="<%=resource%>/icons/vpn-disabled.png" title="<%:Disabled%>" />' ;
+					tr.insertCell(-1).innerHTML = '<img src="<%=resource%>/icons/vpn-disabled.svg" title="<%:Disabled%>" />' ;
 				}
 				else
 				{
 					if ( rv[j-1].started == "0" )
 					{
-						tr.insertCell(-1).innerHTML = '<img src="<%=resource%>/icons/vpn-stopped.png" title="<%:Enabled/Not Running%>" />' ;
+						tr.insertCell(-1).innerHTML = '<img src="<%=resource%>/icons/vpn-stopped.svg" title="<%:Enabled/Not Running%>" />' ;
 					}
 					else
 					{
-						tr.insertCell(-1).innerHTML = '<img src="<%=resource%>/icons/vpn-started.png" title="<%:Running%>" />' ;
+						tr.insertCell(-1).innerHTML = '<img src="<%=resource%>/icons/vpn-started.svg" title="<%:Running%>" />' ;
 					}
 				}
 				tr.insertCell(-1).innerHTML = clr + rv[j-1].laststart + sclr ;

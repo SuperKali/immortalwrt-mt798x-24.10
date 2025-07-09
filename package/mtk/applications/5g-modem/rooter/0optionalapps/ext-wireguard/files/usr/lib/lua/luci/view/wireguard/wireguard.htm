@@ -103,10 +103,10 @@
             peer.persistent_keepalive
           );
         }
-        var icon = '<img src="<%=resource%>/icons/wireguard_disabled.png" />';
+        var icon = '<img src="<%=resource%>/icons/wireguard_disabled.svg" />';
         var now = new Date();
         if (((now.getTime() / 1000) - peer.latest_handshake) < 140) {
-          icon = '<img src="<%=resource%>/icons/wireguard.png" />';
+          icon = '<img src="<%=resource%>/icons/wireguard.svg" />';
         }
         s += String.format(
           '<br /><strong><%:Latest Handshake%>: </strong>%s',

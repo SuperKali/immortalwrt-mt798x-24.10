@@ -17,22 +17,22 @@ function trim(s)
 end
 
 function showicon()
-	return resource .. "/icons/encryption.png"
+	return resource .. "/icons/encryption.svg"
 end
 
 function guess_wifi_signal(info)
 	local scale = scan[info]["quality"]
 	local icon
 	if scale < 15 then
-		icon = resource .. "/icons/signal-0.png"
+		icon = resource .. "/icons/signal-0.svg"
 	elseif scale < 35 then
-		icon = resource .. "/icons/signal-0-25.png"
+		icon = resource .. "/icons/signal-0-25.svg"
 	elseif scale < 55 then
-		icon = resource .. "/icons/signal-25-50.png"
+		icon = resource .. "/icons/signal-25-50.svg"
 	elseif scale < 75 then
-		icon = resource .. "/icons/signal-50-75.png"
+		icon = resource .. "/icons/signal-50-75.svg"
 	else
-		icon = resource .. "/icons/signal-75-100.png"
+		icon = resource .. "/icons/signal-75-100.svg"
 	end
 
 	return icon
