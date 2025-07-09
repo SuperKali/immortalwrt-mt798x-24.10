@@ -1013,6 +1013,20 @@ define Device/glinet_gl-xe3000
 endef
 TARGET_DEVICES += glinet_gl-xe3000
 
+define Device/openfi_6c
+  DEVICE_VENDOR := OpenFi
+  DEVICE_MODEL := 6C (with 256MB+1GB+M.2 for 5G+U3)
+  DEVICE_DTS := mt7981b-openfi-6c
+  DEVICE_DTS_DIR := ../dts
+  SUPPORTED_DEVICES += openfi,6c
+  DEVICE_PACKAGES := automount  kmod-hwmon-pwmfan kmod-usb-net-rndis kmod-usb-serial-option f2fsck losetup mkf2fs kmod-fs-f2fs kmod-mmc luci-app-openfi 
+  KERNEL := kernel-bin | lzma | fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+        fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += openfi_6c
+
 define Device/h3c_magic-nx30-pro
   DEVICE_VENDOR := H3C
   DEVICE_MODEL := Magic NX30 Pro
@@ -1079,7 +1093,7 @@ define Device/Airpi
   DEVICE_MODEL := emmc
   DEVICE_DTS := mt7981b-Airpi-emmc16G
   DEVICE_DTS_DIR := ../dts
-  DEVICE_PACKAGES := kmod-usb-net-cdc-mbim kmod-usb-net-qmi-wwan \
+  DEVICE_PACKAGES := kmod-usb-net-cdc-mbim  kmod-hwmon-pwmfan kmod-usb-net-qmi-wwan \
 		     kmod-usb-serial-option kmod-usb3 automount kmod-Airpi-gpio-fan \
  		f2fsck mkf2fs uqmi luci-app-Airpifanctrl
   KERNEL := kernel-bin | lzma | fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb

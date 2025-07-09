@@ -1,0 +1,74 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "OpenFi Settings"
+msgstr "OpenFi设置"
+
+msgid "Switch Settings"
+msgstr "开关定制"
+
+msgid "Switch configuration"
+msgstr "开关配置"
+
+msgid "LAN"
+msgstr "LAN口"
+
+msgid "WAN"
+msgstr "WAN口"
+
+msgid "On"
+msgstr "开启"
+
+msgid "Off"
+msgstr "关闭"
+
+msgid "Fan Settings"
+msgstr "风扇设置"
+
+msgid "CPU temperature high"
+msgstr "CPU温度上限"
+
+msgid "CPU temperature low"
+msgstr "CPU温度下限"
+
+msgid "WIFI temperature high"
+msgstr "WIFI温度上限"
+
+msgid "WIFI temperature low"
+msgstr "WIFI温度下限"
+
+msgid "Modem temperature high"
+msgstr "模块温度上限"
+
+msgid "Modem temperature low"
+msgstr "模块温度下限"
+
+msgid "Modem Reset Settings"
+msgstr "模块reset脚设置"
+
+msgid "Modem reset reverse"
+msgstr "模块reset脚反转设置"
+
+msgid "WAN/LAN Switch"
+msgstr "WAN/LAN切换开关"
+
+msgid "Modem Power Switch"
+msgstr "Modem电源开关"
+
+msgid "Led Switch"
+msgstr "Led灯开关"
+
+msgid "Temperature Period"
+msgstr "温度查询周期"
+
+msgid "Fan Level"
+msgstr "风扇等级"
+
+msgid "Slow"
+msgstr "慢"
+
+msgid "Middle"
+msgstr "中"
+
+msgid "Fast"
+msgstr "快"

@@ -107,7 +107,8 @@ mediatek_setup_interfaces()
 	glinet,gl-x3000|\
 	glinet,gl-xe3000|\
 	openembed,som7981|\
-	openwrt,one)
+	openwrt,one|\
+	openfi,6c*)
 		ucidef_set_interfaces_lan_wan "eth1 eth1.1234" eth0
 		;;
 	dlink,aquila-pro-ai-m30-a1|\
@@ -223,6 +224,9 @@ mediatek_setup_macs()
 		;;
 	yuncore,ax835)
 		label_mac=$(mtd_get_mac_binary "Factory" 0x4)
+		;;
+	openfi,6c*)
+		lan_mac=$(macaddr_add $(cat /sys/class/net/eth1/address) 1)
 		;;
 	*)
 		wan_mac=$(macaddr_add $(cat /sys/class/net/eth0/address) 1)
