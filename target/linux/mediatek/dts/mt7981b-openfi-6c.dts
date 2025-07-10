@@ -245,9 +245,6 @@
 
 &wifi {
 	status = "okay";
-	mediatek,mtd-eeprom = <&factory 0x0>;
-	nvmem-cells = <&macaddr_eeprom_4 0>;
-	nvmem-cell-names = "mac-address";
 };
 
 &pwm {
