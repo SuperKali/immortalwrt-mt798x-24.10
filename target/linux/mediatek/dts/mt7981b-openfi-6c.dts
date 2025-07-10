@@ -186,7 +186,7 @@
 				factory: partition@180000 {
 					label = "Factory";
 					reg = <0x180000 0x0200000>;
-					macaddr_eeprom_4: macaddr@0 {
+					macaddr: macaddr@0 {
 						reg = <0x4 0x6>;
 					};
 				};
