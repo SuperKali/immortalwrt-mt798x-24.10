@@ -266,7 +266,8 @@
 };
 
 &wifi {
-	mediatek,mtd-eeprom = <&factory 0x0>;
+	status = "okay";
+};
 
 	status = "okay";
 };
