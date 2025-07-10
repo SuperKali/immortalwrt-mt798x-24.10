@@ -170,18 +170,10 @@
 				reg = <0x0100000 0x0080000>;
 			};
 
-			factory: partition@180000 {
-				label = "Factory";
-				reg = <0x180000 0x0200000>;
-				read-only;
-
-				nvmem-layout {
-					compatible = "fixed-layout";
-					#address-cells = <1>;
-					#size-cells = <1>;
-
-					macaddr: macaddr@a {
-						compatible = "mac-base";
+				factory: partition@180000 {
+					label = "Factory";
+					reg = <0x180000 0x0200000>;
+					macaddr: macaddr@0 {
 						reg = <0x4 0x6>;
 						#nvmem-cell-cells = <1>;
 					};
