@@ -53,7 +53,6 @@ struct net_device *eth1_ppd;
 
 static struct ipv6hdr mape_l2w_v6h;
 static struct ipv6hdr mape_w2l_v6h;
-static u16 ext_vlan=0;
 static inline uint8_t get_wifi_hook_if_index_from_dev(const struct net_device *dev)
 {
 	int i;
@@ -574,9 +573,6 @@ unsigned int do_hnat_ext_to_ge(struct sk_buff *skb, const struct net_device *in,
 		}
 		
 		/*set where we come from*/
-		if (skb_vlan_tag_present(skb)){
-		 	ext_vlan = skb->vlan_tci;
-		}
 		__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q), VLAN_CFI_MASK | (in->ifindex & VLAN_VID_MASK)); 
 		trace_printk(
 			"%s: vlan_prot=0x%x, vlan_tci=%x, in->name=%s, skb->dev->name=%s\n",
@@ -615,10 +611,6 @@ unsigned int do_hnat_ext_to_ge2(struct sk_buff *skb, const char *func)
 			if (unlikely(!skb))
 				return -1;
 		}
-		/*Restore original vlan */
-		if (ext_vlan !=0)
-         		__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q), ext_vlan); 
-
 		if (IS_BOND(dev) &&
 		    (((hnat_priv->data->version == MTK_HNAT_V4) &&
 				(skb_hnat_entry(skb) != 0x7fff)) ||
