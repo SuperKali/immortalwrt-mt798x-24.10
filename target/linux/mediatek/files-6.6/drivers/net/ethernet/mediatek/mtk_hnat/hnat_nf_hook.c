@@ -180,7 +180,6 @@ static inline int extif_set_dev(struct net_device *dev, int try_prefix)
 			strncpy(ext_entry->name, dev->name, IFNAMSIZ - 1);
 			dev_hold(dev);
 			ext_entry->dev = dev;
-			ext_vlan = 0;
 			ext_if_add(ext_entry);
 
 			pr_info("%s prefix match (%s)\n", __func__, dev->name);
