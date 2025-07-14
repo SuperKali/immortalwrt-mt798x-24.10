@@ -359,7 +359,7 @@ update_led_status() {
     log_debug "get_modem_info result: $modem_result"
     
     case $modem_result in
-        0)
+        0|6)
             mode=$(parse_json_field "$modem_info" "mode")
             registration=$(parse_json_field "$modem_info" "registration")
             rsrp=$(parse_json_field "$modem_info" "rsrp")
@@ -369,7 +369,7 @@ update_led_status() {
             if [ -z "$registration" ]; then
                 log_debug "Registration empty, keeping current LED state"
                 return
-            elif [ "$registration" != "1" ] && [ "$registration" != "0" ]; then
+            elif [ "$registration" != "1" ] && [ "$registration" != "0" ] && [ "$registration" != "6" ]; then
                 log_debug "Registration invalid value '$registration', keeping current LED state"
                 return
             elif [ "$registration" = "0" ]; then
