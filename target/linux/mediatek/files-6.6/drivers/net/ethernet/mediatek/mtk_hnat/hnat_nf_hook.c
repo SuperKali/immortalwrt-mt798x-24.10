@@ -360,6 +360,7 @@ void ppd_dev_setting(void)
                         netdev_for_each_lower_dev(br_dev, dev, pos) {
                                 if ((dev == eth1_dev) && (dev->flags & IFF_UP)){
                                 	atomic_set(&eth1_in_br, 1);
+					printk("dev is %s",dev->name);
 					hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1");
 					ppd_dev = __dev_get_by_name(&init_net, dev->name);
                                 	break;
@@ -373,6 +374,7 @@ void ppd_dev_setting(void)
                         netdev_for_each_lower_dev(br_dev, dev, pos) {
                                if ((dev == eth1_ppd) && (dev->flags & IFF_UP)) {
                                		atomic_set(&eth1_in_br, 1);
+				       printk("dev is %s",dev->name);
                                		hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1.1234");
 			       		ppd_dev = __dev_get_by_name(&init_net, "eth1");
                                 	break;
@@ -386,6 +388,7 @@ void ppd_dev_setting(void)
                         netdev_for_each_lower_dev(br_dev, dev, pos) {
                                if ((dev == eth0_ppd) && (dev->flags & IFF_UP)) {
                                         atomic_set(&eth1_in_br, 0);
+				       	printk("dev is %s",dev->name);
                                         hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");
                                         ppd_dev = __dev_get_by_name(&init_net, "eth0");
                                         break;
