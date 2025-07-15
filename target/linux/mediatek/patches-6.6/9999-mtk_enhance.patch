@@ -34,7 +34,7 @@
  			hw_lro_flush_stats_update(ring->ring_no, &trxd);
  		}
  
-+		if (sent_ppd && ppd_dev){
++		if (sent_ppd && ppd_dev && (mac!=1)){
 +		skb->protocol = eth_hdr(skb)->h_proto;
 +		skb->dev = ppd_dev;
 +		}
