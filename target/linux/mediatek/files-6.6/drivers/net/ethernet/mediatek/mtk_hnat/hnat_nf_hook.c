@@ -365,20 +365,6 @@ void ppd_dev_setting(void)
                                 }
                         }
                 }
-
-		if (br_dev && eth1_ppd) {
-                        struct net_device *dev;
-                        struct list_head *pos;
-                        netdev_for_each_lower_dev(br_dev, dev, pos) {
-                               if ((dev == eth1_ppd) && (dev->flags & IFF_UP)) {
-                               		atomic_set(&eth1_in_br, 1);
-				       printk("dev is %s",dev->name);
-                               		hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1.1234");
-			       		ppd_dev = __dev_get_by_name(&init_net, "eth1");
-                                	break;
-                                }
-                        }
-                }
 		
 		if (!atomic_read(&eth1_in_br))
                 	hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");          
