@@ -36,6 +36,7 @@
 extern struct net_device *ppd_dev;
 extern atomic_t eth1_in_br;
 struct net_device *br_dev;
+struct net_device *eth1_dev;
 #define do_ge2ext_fast(dev, skb)                                               \
 	(skb_hnat_is_hashed(skb) && \
 	 skb_hnat_reason(skb) == HIT_BIND_FORCE_TO_CPU)
@@ -346,10 +347,11 @@ void ppd_dev_setting(void)
                                 	break;
                                 }
                         }
-                } 
+                }
+	br_dev = __dev_get_by_name(&init_net, "eth0");
 	
-		if (!atomic_read(&eth1_in_br))
-                	hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");          
+	if (!(br_dev & IFF_UP))
+                hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1");          
 }
 
 int nf_hnat_netdevice_event(struct notifier_block *unused, unsigned long event,
