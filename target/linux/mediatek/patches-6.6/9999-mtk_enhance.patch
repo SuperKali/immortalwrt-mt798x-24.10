@@ -22,10 +22,10 @@
  
  		if ( (mac == 4) || ((FIELD_GET(MTK_RXD4_PPE_CPU_REASON, trxd.rxd4)) == HIT_BIND_FORCE_TO_CPU))
 +		{
-+		if (mac!=1){
++		
  		mac = atomic_read(&eth1_in_br);
 -
-+		sent_ppd = 1;}
++		sent_ppd = 1;
 +		}
  		if (unlikely(mac < 0 || mac >= MTK_MAX_DEVS ||
  			     !eth->netdev[mac]))
