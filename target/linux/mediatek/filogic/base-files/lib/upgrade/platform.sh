@@ -66,6 +66,12 @@ platform_do_upgrade() {
 	local board=$(board_name)
 
 	case "$board" in
+        qihoo,360t7)
+		CI_UBIPART="ubi"
+    		CI_KERNPART="kernel"
+      		CI_ROOTPART="rootfs"
+    		nand_do_upgrade "$1"
+    		;;
 	abt,asr3000|\
 	bananapi,bpi-r3|\
 	bananapi,bpi-r3-mini|\
@@ -91,7 +97,6 @@ platform_do_upgrade() {
 	openwrt,one|\
 	netcore,n60|\
 	netcore,n60-pro|\
-	qihoo,360t7|\
 	routerich,ax3000-ubootmod|\
 	tplink,tl-xdr4288|\
 	tplink,tl-xdr6086|\
