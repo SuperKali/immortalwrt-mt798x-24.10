@@ -341,7 +341,7 @@ void ppd_dev_setting(void)
 	br_dev = __dev_get_by_name(&init_net, "br-lan");
         eth1_dev = __dev_get_by_name(&init_net, "eth1");
 	eth1_ppd = __dev_get_by_name(&init_net, "eth1.1234");
-	eth0_ppd = __dev_get_by_name(&init_net, "eth0")
+	eth0_ppd = __dev_get_by_name(&init_net, "eth0");
         atomic_set(&eth1_in_br, 0);
 		if (br_dev) {               
                         struct net_device *dev;
