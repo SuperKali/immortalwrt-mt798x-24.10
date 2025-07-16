@@ -350,8 +350,10 @@ void ppd_dev_setting(void)
                 }
 	br_dev = __dev_get_by_name(&init_net, "eth0");
 	
-	if (!(br_dev->flags & IFF_UP))
-                hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1");          
+	if (!(br_dev->flags & IFF_UP)){
+                hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1");
+		ppd_dev = __dev_get_by_name(&init_net, "eth1");
+		}
 }
 
 int nf_hnat_netdevice_event(struct notifier_block *unused, unsigned long event,
