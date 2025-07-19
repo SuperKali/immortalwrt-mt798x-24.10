@@ -337,6 +337,7 @@ static void gmac_ppe_fwd_enable(struct net_device *dev)
 void ppd_dev_setting(void)
 {
 	br_dev = __dev_get_by_name(&init_net, "br-lan");
+	eth1_dev = __dev_get_by_name(&init_net, "eth1");
         atomic_set(&eth1_in_br, 0);
 		if (br_dev) {               
                         struct net_device *dev;
@@ -353,6 +354,19 @@ void ppd_dev_setting(void)
 	if (!(br_dev->flags & IFF_UP)){
                 hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1");
 		}
+	if (br_dev && eth1_dev) {
+                        struct net_device *dev;
+                        struct list_head *pos;
+                        netdev_for_each_lower_dev(br_dev, dev, pos) {
+                                if ((dev == eth1_dev) && (dev->flags & IFF_UP)){
+                                	atomic_set(&eth1_in_br, 1);
+					printk("dev is %s",dev->name);
+					hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1");
+					ppd_dev = __dev_get_by_name(&init_net, dev->name);
+                                	break;
+                                }
+                        }
+                }
 }
 
 int nf_hnat_netdevice_event(struct notifier_block *unused, unsigned long event,
