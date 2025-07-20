@@ -86,7 +86,6 @@ platform_do_upgrade() {
 	h3c,magic-nx30-pro|\
 	imou,lc-hx3001|\
 	jcg,q30-pro|\
-	jdcloud,re-cp-03|\
 	konka,komi-a31|\
 	livinet,zr-3020-ubootmod|\
 	mediatek,mt7981-rfb|\
@@ -128,6 +127,7 @@ platform_do_upgrade() {
 	smartrg,sdg-8733a|\
 	huasifei,wh3000-pro|\
 	umi,uax3000e|\
+ 	jdcloud,re-cp-03|\
 	smartrg,sdg-8734)
 		CI_KERNPART="kernel"
 		CI_ROOTPART="rootfs"
