@@ -357,6 +357,12 @@ void ppd_dev_setting(void)
         if (br_dev->flags & IFF_UP){
                 hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1");
                 }}
+	br_dev = __dev_get_by_name(&init_net, "eth0");
+	if (br_dev){
+        if (br_dev->flags & IFF_UP){
+		if (br_dev->flags & IFF_RUNNING){
+                hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");
+                }}}
         printk("rx ppd dev is %s",hnat_priv->g_ppdev->name);
         printk("tx ppd dev is %s",ppd_dev->name);
 }
