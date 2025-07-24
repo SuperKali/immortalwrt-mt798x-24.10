@@ -360,11 +360,11 @@ void ppd_dev_setting(void)
 	br_dev = __dev_get_by_name(&init_net, "eth0");
 	if (br_dev){
         if (br_dev->flags & IFF_UP){
-		if (br_dev->flags & IFF_RUNNING){
+		if (br_dev && netif_carrier_ok(br_dev)){
                 hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");
                 }}}
-        printk("rx ppd dev is %s",hnat_priv->g_ppdev->name);
-        printk("tx ppd dev is %s",ppd_dev->name);
+        printk("\nrx now ppd dev is %s\n",hnat_priv->g_ppdev->name);
+        printk("\ntx now ppd dev is %s\n",ppd_dev->name);
 }
 
 int nf_hnat_netdevice_event(struct notifier_block *unused, unsigned long event,
