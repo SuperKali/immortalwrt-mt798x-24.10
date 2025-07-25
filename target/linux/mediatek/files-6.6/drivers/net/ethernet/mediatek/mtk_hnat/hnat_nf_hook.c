@@ -362,6 +362,14 @@ void ppd_dev_setting(void)
         if (br_dev->flags & IFF_UP){
 		if (br_dev && netif_carrier_ok(br_dev)){
                 hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");
+		br_dev = __dev_get_by_name(&init_net, "br-lan");
+		netdev_for_each_lower_dev(br_dev, dev, pos) {
+                                if (dev->flags & IFF_UP) {
+                                        if (strcmp(dev->name, "eth0") == 0) {
+                                        ppd_dev = __dev_get_by_name(&init_net, dev->name);
+                                        break;}
+                                }
+                        }
                 }}}
         printk("\nrx now ppd dev is %s\n",hnat_priv->g_ppdev->name);
         printk("\ntx now ppd dev is %s\n",ppd_dev->name);
