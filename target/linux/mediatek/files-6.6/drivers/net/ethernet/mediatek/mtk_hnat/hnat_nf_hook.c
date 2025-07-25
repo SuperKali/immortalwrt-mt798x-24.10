@@ -363,6 +363,8 @@ void ppd_dev_setting(void)
 		if (br_dev && netif_carrier_ok(br_dev)){
                 hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");
 		br_dev = __dev_get_by_name(&init_net, "br-lan");
+		struct net_device *dev;
+                struct list_head *pos;
 		netdev_for_each_lower_dev(br_dev, dev, pos) {
                                 if (dev->flags & IFF_UP) {
                                         if (strcmp(dev->name, "eth0") == 0) {
