@@ -147,7 +147,8 @@ mediatek_setup_interfaces()
 	wirelesstag,zx7981pd-ubootmod)
 		ucidef_set_interfaces_lan_wan "lan1 lan2" wan
 		;;
-	wirelesstag,zx7981poeq)
+	wirelesstag,zx7981poeq|\
+	wirelesstag,zx7981poeq-ubootmod)
 		ucidef_set_interfaces_lan "lan"
 		;;
 	xiaomi,mi-router-ax3000t|\
