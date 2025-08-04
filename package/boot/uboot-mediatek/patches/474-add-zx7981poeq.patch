@@ -1,6 +1,6 @@
 --- /dev/null
 +++ b/configs/mt7981_zx7981poeq_defconfig
-@@ -0,0 +1,134 @@
+@@ -0,0 +1,140 @@
 +CONFIG_ARM=y
 +CONFIG_SYS_HAS_NONCACHED_MEMORY=y
 +CONFIG_POSITION_INDEPENDENT=y
@@ -72,6 +72,9 @@
 +CONFIG_CMD_SMC=y
 +CONFIG_CMD_EXT4=y
 +CONFIG_CMD_FAT=y
++CONFIG_CMD_MII=y
++CONFIG_CMD_MDIO=y
++CONFIG_CMD_GPIO=y
 +CONFIG_CMD_FS_GENERIC=y
 +CONFIG_CMD_FS_UUID=y
 +CONFIG_OF_EMBED=y
@@ -109,6 +112,9 @@
 +CONFIG_MTD_SPI_NAND=y
 +CONFIG_MTD_UBI_FASTMAP=y
 +CONFIG_PHY_FIXED=y
++CONFIG_PHY_ADDR_ENABLE=y
++CONFIG_PHY_ADDR=6
++CONFIG_PHY_ETHERNET_ID=y
 +CONFIG_MEDIATEK_ETH=y
 +CONFIG_PHY=y
 +CONFIG_PHY_MTK_TPHY=y
@@ -137,7 +143,7 @@
 +CONFIG_LMB_MAX_REGIONS=64
 +--- /dev/null
 +++ b/arch/arm/dts/mt7981b-wirelesstag-zx7981poeq-ubootmod.dts
-@@ -0,0 +1,202 @@
+@@ -0,0 +1,203 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * Copyright (C) 2024 Wireless-Tag
@@ -185,47 +191,47 @@
 +
 +		power {
 +			label = "wt:power:blue";
-+			gpios = <&pio 4 GPIO_ACTIVE_HIGH>;
++			gpios = <&gpio 4 GPIO_ACTIVE_HIGH>;
 +		};
 +
 +		wan {
 +			label = "wt:wan:blue";
-+			gpios = <&pio 22 GPIO_ACTIVE_LOW>;
++			gpios = <&gpio 22 GPIO_ACTIVE_LOW>;
 +		};
 +
 +		lan {
 +			label = "wt:lan:blue";
-+			gpios = <&pio 8 GPIO_ACTIVE_LOW>;
++			gpios = <&gpio 8 GPIO_ACTIVE_LOW>;
 +		};
 +
 +		4g_blue {
 +			label = "wt:4g:blue";
-+			gpios = <&pio 12 GPIO_ACTIVE_HIGH>;
++			gpios = <&gpio 12 GPIO_ACTIVE_HIGH>;
 +		};
 +
 +		4g_yellow {
 +			label = "wt:4g:yellow";
-+			gpios = <&pio 5 GPIO_ACTIVE_HIGH>;
++			gpios = <&gpio 5 GPIO_ACTIVE_HIGH>;
 +		};
 +
 +		5g_blue {
 +			label = "wt:5g:blue";
-+			gpios = <&pio 9 GPIO_ACTIVE_HIGH>;
++			gpios = <&gpio 9 GPIO_ACTIVE_HIGH>;
 +		};
 +
 +		5g_yellow {
 +			label = "wt:5g:yellow";
-+			gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
++			gpios = <&gpio 10 GPIO_ACTIVE_HIGH>;
 +		};
 +
 +		sim1 {
 +			label = "wt:sim1:blue";
-+			gpios = <&pio 13 GPIO_ACTIVE_HIGH>;
++			gpios = <&gpio 13 GPIO_ACTIVE_HIGH>;
 +		};
 +
 +		sim2 {
 +			label = "wt:sim2:blue";
-+			gpios = <&pio 11 GPIO_ACTIVE_HIGH>;
++			gpios = <&gpio 11 GPIO_ACTIVE_HIGH>;
 +		};
 +	};
 +};
@@ -236,8 +242,6 @@
 +
 +&eth {
 +	pinctrl-names = "default";
-+	pinctrl-0 = <&mdio_pins>;
-+
 +	status = "okay";
 +
 +	gmac0: mac@0 {
@@ -246,15 +250,18 @@
 +		phy-mode = "2500base-x";
 +		phy-handle = <&phy6>;
 +	};
-+};
 +
-+&mdio_bus {
-+	phy6: ethernet-phy@6 {
-+		compatible = "ethernet-phy-ieee802.3-c45";
-+		reg = <6>;
-+		reset-assert-us = <100000>;
-+		reset-deassert-us = <100000>;
-+		reset-gpios = <&pio 39 GPIO_ACTIVE_LOW>;
++	mdio: mdio-bus {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		phy6: ethernet-phy@6 {
++			compatible = "ethernet-phy-ieee802.3-c45";
++			reg = <6>;
++			reset-assert-us = <100000>;
++			reset-deassert-us = <100000>;
++			reset-gpios = <&gpio 39 GPIO_ACTIVE_LOW>;
++		};
 +	};
 +};
 +

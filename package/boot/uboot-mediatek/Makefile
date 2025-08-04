@@ -1044,6 +1044,7 @@ UBOOT_TARGETS := \
 	mt7981_xiaomi_mi-router-ax3000t \
 	mt7981_xiaomi_mi-router-wr30u \
   mt7981_wirelesstag_zx7981pd \
+  mt7981_wirelesstag_zx7981poeq \
 	mt7986_bananapi_bpi-r3-emmc \
 	mt7986_bananapi_bpi-r3-sdmmc \
 	mt7986_bananapi_bpi-r3-snand \
