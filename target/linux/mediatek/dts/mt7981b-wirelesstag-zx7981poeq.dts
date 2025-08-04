@@ -143,7 +143,6 @@
                 phy-handle = <&phy6>;
                 nvmem-cell-names = "mac-address";
                 nvmem-cells = <&macaddr_factory_4 (-1)>;
-                label = "lan";
         };
 		// FAKE ETH1 interface dedicated to USB Offload
         gmac1: mac@1 {

@@ -137,7 +137,7 @@
 +CONFIG_LMB_MAX_REGIONS=64
 +--- /dev/null
 +++ b/arch/arm/dts/mt7981b-wirelesstag-zx7981poeq-ubootmod.dts
-@@ -0,0 +1,203 @@
+@@ -0,0 +1,202 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * Copyright (C) 2024 Wireless-Tag
@@ -245,7 +245,6 @@
 +		reg = <0>;
 +		phy-mode = "2500base-x";
 +		phy-handle = <&phy6>;
-+		label = "lan";
 +	};
 +};
 +
