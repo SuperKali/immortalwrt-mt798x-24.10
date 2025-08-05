@@ -26,7 +26,7 @@
 +CONFIG_DEFAULT_FDT_FILE="mediatek/mt7981b-wirelesstag-zx7981poeq-ubootmod.dtb"
 +CONFIG_SYS_CBSIZE=512
 +CONFIG_SYS_PBSIZE=1049
-+CONFIG_LOGLEVEL=7
++CONFIG_LOGLEVEL=8
 +CONFIG_PRE_CONSOLE_BUFFER=y
 +CONFIG_LOG=y
 +CONFIG_BOARD_LATE_INIT=y
@@ -46,7 +46,7 @@
 +CONFIG_CMD_ENV_FLAGS=y
 +CONFIG_CMD_STRINGS=y
 +# CONFIG_CMD_UNLZ4 is not set
-+# CONFIG_CMD_UNZIP is not set
++CONFIG_CMD_LOG=y
 +CONFIG_CMD_DM=y
 +CONFIG_CMD_GPIO=y
 +CONFIG_CMD_PWM=y
@@ -113,11 +113,11 @@
 +CONFIG_MTD_UBI_FASTMAP=y
 +CONFIG_PHY_FIXED=y
 +CONFIG_PHY_ADDR_ENABLE=y
-+CONFIG_PHY_ADDR=6
 +CONFIG_PHY_ETHERNET_ID=y
 +CONFIG_MEDIATEK_ETH=y
 +CONFIG_PHY=y
 +CONFIG_PHY_MTK_TPHY=y
++CONFIG_PHY_REALTEK=y
 +CONFIG_PINCTRL=y
 +CONFIG_PINCONF=y
 +CONFIG_PINCTRL_MT7981=y
@@ -143,7 +143,7 @@
 +CONFIG_LMB_MAX_REGIONS=64
 +--- /dev/null
 +++ b/arch/arm/dts/mt7981b-wirelesstag-zx7981poeq-ubootmod.dts
-@@ -0,0 +1,203 @@
+@@ -0,0 +1,200 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * Copyright (C) 2024 Wireless-Tag
@@ -241,28 +241,25 @@
 +};
 +
 +&eth {
-+	pinctrl-names = "default";
-+	status = "okay";
++       status = "okay";
++       pinctrl-names = "default";
 +
-+	gmac0: mac@0 {
-+		compatible = "mediatek,eth-mac";
-+		reg = <0>;
-+		phy-mode = "2500base-x";
-+		phy-handle = <&phy6>;
-+	};
++       mediatek,gmac-id = <0>;
++       phy-mode = "2500base-x";
++       phy-handle = <&phy6>;
 +
-+	mdio: mdio-bus {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
++       mdio-bus {
++               #address-cells = <1>;
++               #size-cells = <0>;
 +
-+		phy6: ethernet-phy@6 {
-+			compatible = "ethernet-phy-ieee802.3-c45";
-+			reg = <6>;
-+			reset-assert-us = <100000>;
-+			reset-deassert-us = <100000>;
-+			reset-gpios = <&gpio 39 GPIO_ACTIVE_LOW>;
-+		};
-+	};
++               phy6: ethernet-phy@6 {
++                       compatible = "ethernet-phy-ieee802.3-c45";
++                       reg = <6>;
++                       reset-assert-us = <10000>;
++                       reset-deassert-us = <60000>;
++                       reset-gpios = <&gpio 39 GPIO_ACTIVE_LOW>;
++               };
++       };
 +};
 +
 +&pinctrl {

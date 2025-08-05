@@ -1,0 +1,47 @@
+--- a/drivers/net/phy/realtek.c	2025-08-05 12:08:46.594568013 +0200
++++ b/drivers/net/phy/realtek.c	2025-08-05 12:08:24.909611232 +0200
+@@ -397,6 +397,29 @@
+ 	return rtl8211f_parse_status(phydev);
+ }
+
++static int rtl8221b_config(struct phy_device *phydev)
++{
++	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x75F3, 0);
++	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x697A, 0x8002);
++	phy_write_mmd(phydev, MDIO_MMD_AN, 0, 0x3200);
++
++	return 0;
++}
++
++static int rtl8221b_startup(struct phy_device *phydev)
++{
++	int ret;
++
++	ret = genphy_update_link(phydev);
++	if (ret)
++		return ret;
++
++	phydev->speed = SPEED_1000;
++	phydev->duplex = DUPLEX_FULL;
++
++	return 0;
++}
++
+ /* Support for RTL8211B PHY */
+ U_BOOT_PHY_DRIVER(rtl8211b) = {
+ 	.name = "RealTek RTL8211B",
+@@ -494,3 +471,14 @@
+ 	.startup = &genphy_startup,
+ 	.shutdown = &genphy_shutdown,
+ };
++
++/* Support for RTL8221B PHY */
++U_BOOT_PHY_DRIVER(rtl8221b) = {
++		.name = "RealTek RTL8221B 10/100/1000/2500Mbps Ethernet",
++		.uid = 0x1cc849,
++		.mask = 0xffffff,
++		.features = PHY_GBIT_FEATURES,
++		.config = &rtl8221b_config,
++		.startup = &rtl8221b_startup,
++		.shutdown = &genphy_shutdown,
++};
