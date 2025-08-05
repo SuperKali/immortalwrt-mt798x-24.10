@@ -144,7 +144,9 @@ mediatek_setup_interfaces()
 		ucidef_set_interface_lan "lan1 lan2 eth1"
 		;;
 	wirelesstag,zx7981pd|\
-	wirelesstag,zx7981pd-ubootmod)
+	wirelesstag,zx7981pde|\
+	wirelesstag,zx7981pd-ubootmod|\
+	wirelesstag,zx7981pde-ubootmod)
 		ucidef_set_interfaces_lan_wan "lan1 lan2" wan
 		;;
 	wirelesstag,zx7981poeq|\
