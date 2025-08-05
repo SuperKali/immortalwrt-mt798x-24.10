@@ -7,7 +7,7 @@
 
 / {
 	model = "Wireless-Tag ZX7981PD";
-	compatible = "wirelesstag","zx7981pd", "mediatek,mt7981";
+	compatible = "wirelesstag,zx7981pd", "mediatek,mt7981";
 
 	aliases {
 		ethernet0 = &gmac0;
