@@ -1,5 +1,7 @@
 #!/bin/sh
 
+PREFERRED_TTY="/dev/ttyUSB1"
+
 query_modem_info() {
     local device="$1"
     local registration mode rsrp

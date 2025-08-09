@@ -15,14 +15,17 @@ fi
 uci -q get led-modem-controller.settings >/dev/null || {
     uci set led-modem-controller.settings=led_controller
     uci set led-modem-controller.settings.enabled='1'
-    uci set led-modem-controller.settings.device='/dev/ttyUSB2'
-    uci set led-modem-controller.settings.fallback_devices='/dev/ttyUSB1 /dev/ttyUSB3'
+    uci set led-modem-controller.settings.fallback_devices='/dev/ttyUSB1 /dev/ttyUSB2 /dev/ttyUSB3'
     uci set led-modem-controller.settings.update_interval='60'
     uci set led-modem-controller.settings.timeout='15'
     uci set led-modem-controller.settings.max_errors='3'
     uci set led-modem-controller.settings.cache_timeout='180'
     uci set led-modem-controller.settings.debug='0'
     uci commit led-modem-controller
+}
+
+uci -q get led-modem-controller.settings.device >/dev/null || {
+    uci delete led-modem-controller.settings.device
 }
 
 /etc/init.d/led-modem-controller enable

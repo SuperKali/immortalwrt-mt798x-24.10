@@ -515,7 +515,14 @@ start_daemon() {
     load_config
     local UPDATE_INTERVAL=$(uci -q get led-modem-controller.settings.update_interval || echo "30")
     
-    log_status "Monitoring modem on $DEVICE, update interval: ${UPDATE_INTERVAL}s"
+    modem_id=$(get_modem_id_from_system)
+    load_modem_driver "$modem_id"
+    
+    if [ -n "$PREFERRED_TTY" ]; then
+        log_status "Monitoring modem $modem_id on preferred $PREFERRED_TTY, fallback: $FALLBACK_DEVICES, update interval: ${UPDATE_INTERVAL}s"
+    else
+        log_status "Monitoring modem $modem_id on fallback devices: $FALLBACK_DEVICES, update interval: ${UPDATE_INTERVAL}s"
+    fi
     
     while true; do
         log_debug "Main loop iteration"
@@ -633,7 +640,14 @@ main() {
         config)
             load_config
             echo "Current configuration:"
-            echo "Primary device: $DEVICE"
+            
+            modem_id=$(get_modem_id_from_system)
+            load_modem_driver "$modem_id"
+            
+            echo "Detected modem: $modem_id"
+            if [ -n "$PREFERRED_TTY" ]; then
+                echo "Preferred TTY: $PREFERRED_TTY"
+            fi
             echo "Fallback devices: $FALLBACK_DEVICES"
             echo "Update interval: $(uci -q get led-modem-controller.settings.update_interval || echo "30")s"
             echo "Timeout: $TIMEOUT"s

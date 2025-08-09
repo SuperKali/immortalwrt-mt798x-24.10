@@ -1,7 +1,6 @@
 config led_controller 'settings'
 	option enabled '1'
-	option device '/dev/ttyUSB2'
-	option fallback_devices '/dev/ttyUSB1 /dev/ttyUSB3'
+	option fallback_devices '/dev/ttyUSB1 /dev/ttyUSB2 /dev/ttyUSB3'
 	option update_interval '60'
 	option timeout '15'
 	option max_errors '3'

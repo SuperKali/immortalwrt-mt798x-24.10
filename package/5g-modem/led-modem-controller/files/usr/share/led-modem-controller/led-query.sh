@@ -1,3 +1,5 @@
+#!/bin/sh
+
 set -e
 
 SCRIPT_DIR="/usr/share/led-modem-controller"
@@ -9,7 +11,6 @@ find_working_device() {
     load_config
 
     log_debug "Looking for working device..."
-    log_debug "Primary device: $DEVICE"
     log_debug "Fallback devices: $FALLBACK_DEVICES"
 
     local cached_device=""
@@ -23,14 +24,21 @@ find_working_device() {
         fi
     fi
 
-    log_debug "Testing primary device: $DEVICE"
-    if test_device_availability "$DEVICE"; then
-        echo "$DEVICE" > "$CACHE_FILE"
-        echo "$DEVICE"
-        return 0
+    local modem_id=$(get_modem_id_from_system)
+    log_debug "Detected system modem ID: $modem_id"
+    
+    load_modem_driver "$modem_id"
+    
+    if [ -n "$PREFERRED_TTY" ]; then
+        log_debug "Testing preferred TTY for $modem_id: $PREFERRED_TTY"
+        if test_device_availability "$PREFERRED_TTY"; then
+            echo "$PREFERRED_TTY" > "$CACHE_FILE"
+            echo "$PREFERRED_TTY"
+            return 0
+        fi
     fi
 
-    log_debug "Primary device failed, trying fallback devices"
+    log_debug "Preferred device failed, trying fallback devices"
     for device in $FALLBACK_DEVICES; do
         log_debug "Testing fallback device: $device"
         if test_device_availability "$device"; then
@@ -98,9 +106,16 @@ case "${1:-query}" in
         echo "=== LED Modem Controller Device Detection ==="
         echo "Checking devices..."
 
+        modem_id=$(get_modem_id_from_system)
+        echo "Detected modem ID: $modem_id"
+        
+        load_modem_driver "$modem_id"
+        if [ -n "$PREFERRED_TTY" ]; then
+            echo "Preferred TTY: $PREFERRED_TTY"
+        fi
+
         device=$(find_working_device)
         if [ -n "$device" ]; then
-            modem_id=$(detect_modem_type "$device")
             echo "SUCCESS: Found working device"
             echo "Device: $device"
             echo "Type: $modem_id"
@@ -154,7 +169,14 @@ case "${1:-query}" in
     "config")
         load_config
         echo "=== LED Modem Controller Configuration ==="
-        echo "Primary device: $DEVICE"
+        
+        modem_id=$(get_modem_id_from_system)
+        load_modem_driver "$modem_id"
+        
+        echo "Detected modem: $modem_id"
+        if [ -n "$PREFERRED_TTY" ]; then
+            echo "Preferred TTY: $PREFERRED_TTY"
+        fi
         echo "Fallback devices: $FALLBACK_DEVICES"
         echo "Timeout: ${TIMEOUT}s"
         echo "Debug: $DEBUG"

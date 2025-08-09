@@ -1,5 +1,7 @@
 #!/bin/sh
 
+PREFERRED_TTY="/dev/ttyUSB1"
+
 query_modem_info() {
     local device="$1"
     local registration mode rsrp
@@ -50,8 +52,8 @@ JSON_EOF
         T=$(echo "$T1" | awk -F, '{print $13}')
         if [ -n "$T" ] && [ "$T" != "255" ]; then
             case $T_RAT in
-                4) rsrp=$((T - 141));;  # LTE
-                9) rsrp=$((T - 157));;  # 5G NR
+                4) rsrp=$((T - 141));;
+                9) rsrp=$((T - 157));;
             esac
         fi
     fi

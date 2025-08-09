@@ -3,8 +3,7 @@
 MODEM_LIB_DIR="/usr/share/led-modem-controller"
 
 load_config() {
-    DEVICE=$(uci -q get led-modem-controller.settings.device || echo "/dev/ttyUSB2")
-    FALLBACK_DEVICES=$(uci -q get led-modem-controller.settings.fallback_devices || echo "/dev/ttyUSB1 /dev/ttyUSB0 /dev/ttyACM0")
+    FALLBACK_DEVICES=$(uci -q get led-modem-controller.settings.fallback_devices || echo "/dev/ttyUSB1 /dev/ttyUSB2 /dev/ttyUSB3")
     TIMEOUT=$(uci -q get led-modem-controller.settings.timeout || echo "15")
     MAX_ERRORS=$(uci -q get led-modem-controller.settings.max_errors || echo "3")
     CACHE_TIMEOUT=$(uci -q get led-modem-controller.settings.cache_timeout || echo "180")
@@ -69,15 +68,41 @@ detect_modem_type() {
     echo "generic"
 }
 
+get_modem_id_from_system() {
+    local vendor_id product_id
+    
+    for dev_path in /sys/class/tty/ttyUSB*/device /sys/class/tty/ttyACM*/device; do
+        [ -e "$dev_path" ] || continue
+        
+        local usb_device_path=$(readlink -f "$dev_path")
+        while [ -n "$usb_device_path" ] && [ "$usb_device_path" != "/" ]; do
+            if [ -f "$usb_device_path/idVendor" ] && [ -f "$usb_device_path/idProduct" ]; then
+                vendor_id=$(cat "$usb_device_path/idVendor" 2>/dev/null)
+                product_id=$(cat "$usb_device_path/idProduct" 2>/dev/null)
+                if [ -n "$vendor_id" ] && [ -n "$product_id" ]; then
+                    echo "${vendor_id}${product_id}"
+                    return 0
+                fi
+            fi
+            usb_device_path=$(dirname "$usb_device_path")
+        done
+    done
+    
+    echo "generic"
+}
+
 load_modem_driver() {
     local modem_id="$1"
     local modem_file="$MODEM_LIB_DIR/modem/usb/$modem_id"
     
     log_debug "Loading driver: $modem_file"
     
+    PREFERRED_TTY=""
+    
     if [ -f "$modem_file" ]; then
         . "$modem_file"
         log_debug "Loaded specific driver for $modem_id"
+        log_debug "Preferred TTY: $PREFERRED_TTY"
         return 0
     else
         . "$MODEM_LIB_DIR/modem/usb/generic"
