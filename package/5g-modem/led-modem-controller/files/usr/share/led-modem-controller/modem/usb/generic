@@ -1,0 +1,53 @@
+#!/bin/sh
+
+query_modem_info() {
+    local device="$1"
+    local registration mode rsrp csq signal
+    
+    load_config
+    
+    local reg_response=$(sms_tool_query "AT+CREG?" "$device")
+    registration=$(echo "$reg_response" | grep "+CREG:" | cut -d: -f2 | cut -d, -f2 | tr -d ' ')
+    
+    if [ "$registration" != "1" ] && [ "$registration" != "5" ]; then
+        cat << NOSERVICE_EOF
+{
+    "device": "$(basename "$device")",
+    "registration": "${registration:-0}",
+    "mode": "No Service",
+    "rsrp": "-999"
+}
+NOSERVICE_EOF
+        return
+    fi
+    
+    local mode_response=$(sms_tool_query "AT+COPS?" "$device")
+    local rat=$(echo "$mode_response" | grep "+COPS:" | cut -d, -f4 | tr -d '"' | tr -d ' ')
+    
+    case "$rat" in
+        "0"|"2") mode="2G/GSM" ;;
+        "1"|"3") mode="3G/UMTS" ;;
+        "7") mode="LTE" ;;
+        "13") mode="5G NSA" ;;
+        "11") mode="5G SA" ;;
+        *) mode="Unknown" ;;
+    esac
+    
+    local csq_response=$(sms_tool_query "AT+CSQ" "$device")
+    csq=$(echo "$csq_response" | grep "+CSQ:" | cut -d: -f2 | cut -d, -f1 | tr -d ' ')
+    
+    if [ -n "$csq" ] && [ "$csq" -ne "99" ] && [ "$csq" -ne "0" ]; then
+        rsrp=$((-113 + (csq * 2)))
+    else
+        rsrp="-999"
+    fi
+    
+    cat << RESULT_EOF
+{
+    "device": "$(basename "$device")",
+    "registration": "${registration:-0}",
+    "mode": "${mode:-Unknown}",
+    "rsrp": "${rsrp:--999}"
+}
+RESULT_EOF
+}

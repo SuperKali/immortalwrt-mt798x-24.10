@@ -4,10 +4,28 @@ if [ -f "/usr/bin/led-modem-controller" ] && [ ! -x "/usr/bin/led-modem-controll
     chmod +x /usr/bin/led-modem-controller || echo "Error: Unable to set executable permission for /usr/bin/led-modem-controller"
 fi
 
+if [ -f "/usr/share/led-modem-controller/led-query.sh" ] && [ ! -x "/usr/share/led-modem-controller/led-query.sh" ]; then
+    chmod +x /usr/share/led-modem-controller/led-query.sh || echo "Error: Unable to set executable permission for led-query.sh"
+fi
+
 if [ -f "/etc/init.d/led-modem-controller" ] && [ ! -x "/etc/init.d/led-modem-controller" ]; then
     chmod +x /etc/init.d/led-modem-controller || echo "Error: Unable to set executable permission for /etc/init.d/led-modem-controller"
-    /etc/init.d/led-modem-controller enable
-    /etc/init.d/led-modem-controller start
 fi
+
+uci -q get led-modem-controller.settings >/dev/null || {
+    uci set led-modem-controller.settings=led_controller
+    uci set led-modem-controller.settings.enabled='1'
+    uci set led-modem-controller.settings.device='/dev/ttyUSB2'
+    uci set led-modem-controller.settings.fallback_devices='/dev/ttyUSB1 /dev/ttyUSB3'
+    uci set led-modem-controller.settings.update_interval='60'
+    uci set led-modem-controller.settings.timeout='15'
+    uci set led-modem-controller.settings.max_errors='3'
+    uci set led-modem-controller.settings.cache_timeout='180'
+    uci set led-modem-controller.settings.debug='0'
+    uci commit led-modem-controller
+}
+
+/etc/init.d/led-modem-controller enable
+/etc/init.d/led-modem-controller start
 
 exit 0

@@ -9,6 +9,14 @@ PROG="/usr/bin/led-modem-controller"
 NAME="led-modem-controller"
 
 start_service() {
+    local enabled
+    enabled=$(uci -q get led-modem-controller.settings.enabled || echo "1")
+    
+    if [ "$enabled" != "1" ]; then
+        logger -t led-modem-controller "Service disabled in configuration"
+        return 0
+    fi
+
     [ -x "$PROG" ] || {
         logger -t led-modem-controller "Program not found or not executable: $PROG"
         return 1

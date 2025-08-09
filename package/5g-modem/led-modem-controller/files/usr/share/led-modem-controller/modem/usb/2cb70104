@@ -1,0 +1,120 @@
+#!/bin/sh
+
+query_modem_info() {
+    local device="$1"
+    local registration mode rsrp
+    local O T1 T_RAT MODE_NUM COPS_MCC
+
+    load_config
+
+    log_debug "Fibocom FM150/FM160 driver: querying $device"
+
+    local reg_response=$(sms_tool_query "AT+CREG?" "$device")
+    log_debug "Full CREG response: $reg_response"
+
+    registration=$(echo "$reg_response" | grep "+CREG:" | head -1 | cut -d: -f2 | cut -d, -f2 | tr -d ' \r\n\t')
+    log_debug "Parsed registration: $registration"
+
+    if [ "$registration" != "1" ] && [ "$registration" != "5" ]; then
+        cat << 'JSON_EOF'
+{
+    "device": "$(basename "$device")",
+    "registration": "${registration:-0}",
+    "mode": "No Service",
+    "rsrp": "-999"
+}
+JSON_EOF
+        return
+    fi
+
+    O=$(sms_tool_query "AT+GTCCINFO?;+GTCAINFO?" "$device")
+    log_debug "GTCCINFO response length: ${#O}"
+
+    local mode_response=$(sms_tool_query "AT+COPS?" "$device")
+    log_debug "COPS response: $mode_response"
+
+    MODE_NUM=$(echo "$mode_response" | grep "+COPS:" | head -1 | cut -d, -f4 | tr -d '"' | tr -d ' \r\n\t')
+    COPS_MCC=$(echo "$mode_response" | grep "+COPS:" | head -1 | cut -d, -f3 | cut -c2-4)
+
+    log_debug "MODE_NUM: $MODE_NUM"
+    log_debug "COPS_MCC: $COPS_MCC"
+
+    case "$MODE_NUM" in
+        7*)
+            mode="LTE"
+            ;;
+        11*)
+            mode="5G SA"
+            ;;
+        13*)
+            mode="5G NSA"
+            ;;
+        *)
+            mode="LTE"
+            ;;
+    esac
+
+    if [ -n "$COPS_MCC" ] && [ -n "$O" ]; then
+        T1=$(echo "$O" | grep -A10 '+GTCCINFO:' | grep "1,[49],${COPS_MCC}" | head -1)
+        log_debug "T1 line: $T1"
+
+        if [ -n "$T1" ]; then
+            T_RAT=$(echo "$T1" | awk -F, '{print $2}')
+            log_debug "T_RAT: $T_RAT"
+
+            if [ "$T_RAT" = "4" ]; then
+                local T=$(echo "$T1" | awk -F, '{print $13}')
+                log_debug "Raw RSRP value: $T"
+                if [ -n "$T" ] && echo "$T" | grep -q '^[0-9]\+$' && [ "$T" -ne "255" ]; then
+                    rsrp=$((T - 141))
+                    log_debug "Calculated LTE RSRP: $rsrp"
+                fi
+            elif [ "$T_RAT" = "9" ]; then
+                local T=$(echo "$T1" | awk -F, '{print $13}')
+                log_debug "Raw RSRP value: $T"
+                if [ -n "$T" ] && echo "$T" | grep -q '^[0-9]\+$' && [ "$T" -ne "255" ]; then
+                    rsrp=$((T - 157))
+                    log_debug "Calculated 5G RSRP: $rsrp"
+                fi
+            fi
+        fi
+    fi
+
+    if [ -n "$O" ]; then
+        local LINES_LTE=$(echo "$O" | grep -E '^LTE PCC:|^PCC:')
+        local LINES_NR=$(echo "$O" | grep -E '^NR PCC:')
+        local LINES_SCC=$(echo "$O" | grep -E '^LTE SCC|^SCC[0-9]:')
+
+        log_debug "Found LTE PCC: $(echo "$LINES_LTE" | wc -l) lines"
+        log_debug "Found NR PCC: $(echo "$LINES_NR" | wc -l) lines"
+        log_debug "Found SCC: $(echo "$LINES_SCC" | wc -l) lines"
+
+        if [ -n "$LINES_NR" ]; then
+            mode="5G NSA"
+        elif [ -n "$LINES_SCC" ]; then
+            mode="LTE-A"
+        fi
+    fi
+
+    if [ -z "$rsrp" ] || [ "$rsrp" = "-999" ]; then
+        local csq_response=$(sms_tool_query "AT+CSQ" "$device")
+        local csq=$(echo "$csq_response" | grep "+CSQ:" | head -1 | cut -d: -f2 | cut -d, -f1 | tr -d ' \r\n\t')
+        log_debug "CSQ fallback: $csq"
+
+        if [ -n "$csq" ] && echo "$csq" | grep -q '^[0-9]\+$' && [ "$csq" -ne "99" ] && [ "$csq" -ne "0" ]; then
+            rsrp=$((-113 + (csq * 2)))
+            log_debug "Calculated RSRP from CSQ: $rsrp"
+        fi
+    fi
+
+    log_debug "Final results - Mode: $mode, RSRP: $rsrp, Registration: $registration"
+
+    cat << JSON_END
+{
+    "device": "$(basename "$device")",
+    "registration": "${registration:-0}",
+    "mode": "${mode:-LTE}",
+    "rsrp": "${rsrp:--999}"
+}
+JSON_END
+}

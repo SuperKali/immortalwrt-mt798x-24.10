@@ -6,25 +6,19 @@ readonly SCRIPT_NAME="$(basename "$0")"
 readonly PID_FILE="/var/run/${SCRIPT_NAME%.sh}.pid"
 readonly STATES_FILE="/tmp/led_modem_states"
 readonly CACHE_FILE="/tmp/led_modem_cache"
-readonly CACHE_TIMEOUT=180
-readonly MAX_ERRORS=3
 readonly ERROR_COUNT_FILE="/tmp/led_modem_errors"
-readonly UPDATE_INTERVAL=30
-readonly MODEM_INFO_CMD="/usr/share/3ginfo-lite/3ginfo.sh"
-readonly MODEM_TIMEOUT=15
-
-readonly LED_4G_BLUE="/sys/class/leds/wt:4g:blue"
-readonly LED_4G_GREEN="/sys/class/leds/wt:4g:green"
-readonly LED_4G_YELLOW="/sys/class/leds/wt:4g:yellow"
-readonly LED_5G_BLUE="/sys/class/leds/wt:5g:blue"
-readonly LED_5G_YELLOW="/sys/class/leds/wt:5g:yellow"
+readonly MODEM_INFO_CMD="/usr/share/led-modem-controller/led-query.sh"
 
 readonly EXIT_SUCCESS=0
 readonly EXIT_ERROR=1
 readonly EXIT_ALREADY_RUNNING=2
 readonly EXIT_NOT_RUNNING=3
 
+. /usr/share/led-modem-controller/common.sh
+
 cleanup() {
+    load_config
+    
     for led in "$LED_4G_BLUE" "$LED_4G_GREEN" "$LED_4G_YELLOW" "$LED_5G_BLUE" "$LED_5G_YELLOW"; do
         echo 0 > "$led/brightness" 2>/dev/null || true
         echo none > "$led/trigger" 2>/dev/null || true
@@ -35,20 +29,6 @@ cleanup() {
 }
 
 trap cleanup INT TERM EXIT
-
-log_debug() {
-    echo "[DEBUG $(date '+%H:%M:%S')] $*" >> "/tmp/led_debug.log"
-}
-
-log_error() {
-    echo "ERROR: $*" >&2
-    log_debug "ERROR: $*"
-}
-
-log_info() {
-    echo "INFO: $*"
-    log_debug "INFO: $*"
-}
 
 is_daemon_running() {
     [ -f "$PID_FILE" ] || return 1
@@ -80,8 +60,10 @@ create_pid_file() {
 }
 
 validate_environment() {
+    load_config
+    
     [ -x "$MODEM_INFO_CMD" ] || {
-        log_error "Modem info command not found: $MODEM_INFO_CMD"
+        log_error "LED modem query script not found: $MODEM_INFO_CMD"
         return $EXIT_ERROR
     }
     
@@ -109,6 +91,7 @@ led_set_state() {
         "on")
             if echo none > "$led_path/trigger" 2>/dev/null && echo 1 > "$led_path/brightness" 2>/dev/null; then
                 update_state_file "$led_name" "$new_state"
+                log_debug "LED $led_name turned ON"
             else
                 log_error "Failed to turn on LED: $led_path"
             fi
@@ -116,6 +99,7 @@ led_set_state() {
         "off")
             if echo 0 > "$led_path/brightness" 2>/dev/null && echo none > "$led_path/trigger" 2>/dev/null; then
                 update_state_file "$led_name" "$new_state"
+                log_debug "LED $led_name turned OFF"
             else
                 log_error "Failed to turn off LED: $led_path"
             fi
@@ -144,6 +128,8 @@ update_state_file() {
 
 get_cached_data() {
     [ -f "$CACHE_FILE" ] || return 1
+    
+    load_config
     
     local cache_time current_time age cached_data
     cache_time=$(head -n1 "$CACHE_FILE" 2>/dev/null) || return 1
@@ -242,23 +228,23 @@ wait_for_modem() {
     log_debug "Waiting for modem devices..."
     
     while [ $count -lt $max_wait ]; do
-        for device in "/dev/ttyUSB0" "/dev/ttyUSB1" "/dev/ttyUSB2" "/dev/cdc-wdm0"; do
-            if [ -e "$device" ]; then
-                log_debug "Modem device found: $device"
-                sleep 2
-                return 0
-            fi
-        done
+        if "$MODEM_INFO_CMD" detect >/dev/null 2>&1; then
+            log_debug "Working modem device found"
+            sleep 2
+            return 0
+        fi
         sleep 1
         count=$((count + 1))
     done
     
-    log_debug "No modem devices found"
+    log_debug "No working modem devices found"
     return 1
 }
 
 get_modem_info() {
     local info result error_count
+    
+    load_config
     
     log_debug "Attempting to get modem info..."
     
@@ -274,14 +260,14 @@ get_modem_info() {
         fi
     fi
     
-    info=$(run_with_timeout "$MODEM_TIMEOUT" "$MODEM_INFO_CMD")
+    info=$(run_with_timeout "$TIMEOUT" "$MODEM_INFO_CMD query")
     result=$?
     
     log_debug "Command result: $result, data length: ${#info}"
     
     if [ $result -eq 0 ] && [ -n "$info" ]; then
         if echo "$info" | grep -q '"error"'; then
-            log_debug "JSON contains error"
+            log_debug "JSON contains error: $(echo "$info" | grep '"error"')"
             increment_error_count
             error_count=$(get_error_count)
             
@@ -308,7 +294,7 @@ get_modem_info() {
             [ "$error_count" -lt "$MAX_ERRORS" ] && return 1 || return 2
         fi
     else
-        log_debug "Command failed"
+        log_debug "Command failed with result: $result"
         increment_error_count
         error_count=$(get_error_count)
         
@@ -324,11 +310,39 @@ parse_json_field() {
     local json_data="$1"
     local field="$2"
     
-    echo "$json_data" | grep -o "\"$field\":\"[^\"]*\"" | cut -d'"' -f4
+    log_debug "Parsing field '$field' from JSON data"
+    log_debug "JSON data received: $json_data"
+    
+    local result=$(echo "$json_data" | awk -F'"' -v field="$field" '
+        BEGIN { found=0 }
+        {
+            for(i=1; i<=NF; i++) {
+                if($i == field && $(i+2) != "" && !found) {
+                    print $(i+2)
+                    found=1
+                    exit
+                }
+            }
+        }
+    ')
+    
+    if [ -z "$result" ]; then
+        result=$(echo "$json_data" | grep -o "\"$field\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | head -1 | sed "s/.*\"$field\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/")
+    fi
+    
+    result=$(echo "$result" | tr -d '\r\n\t' | xargs)
+    
+    log_debug "Extracted value for '$field': '$result'"
+    echo "$result"
 }
 
 get_4g_signal_led() {
     local rsrp="$1"
+    
+    load_config
+    
+    log_debug "Calculating 4G LED for RSRP: $rsrp"
+    log_debug "Thresholds - Excellent: $EXCELLENT_RSRP, Good: $GOOD_RSRP"
     
     if [ -z "$rsrp" ] || ! echo "$rsrp" | grep -q '^-\?[0-9]\+$'; then
         log_debug "Invalid RSRP value '$rsrp', using fallback (yellow)"
@@ -336,13 +350,18 @@ get_4g_signal_led() {
         return
     fi
     
-    rsrp=$(echo "$rsrp" | sed 's/^-//')
+    rsrp_abs=$(echo "$rsrp" | sed 's/^-//')
+    excellent_abs=$(echo "$EXCELLENT_RSRP" | sed 's/^-//')
+    good_abs=$(echo "$GOOD_RSRP" | sed 's/^-//')
     
-    if [ "$rsrp" -le 80 ]; then
+    if [ "$rsrp_abs" -le "$excellent_abs" ]; then
+        log_debug "Excellent signal: $rsrp <= $EXCELLENT_RSRP -> Blue LED"
         echo "$LED_4G_BLUE"
-    elif [ "$rsrp" -le 89 ]; then
+    elif [ "$rsrp_abs" -le "$good_abs" ]; then
+        log_debug "Good signal: $rsrp <= $GOOD_RSRP -> Green LED"
         echo "$LED_4G_GREEN"
     else
+        log_debug "Weak signal: $rsrp > $GOOD_RSRP -> Yellow LED"
         echo "$LED_4G_YELLOW"
     fi
 }
@@ -350,6 +369,8 @@ get_4g_signal_led() {
 update_led_status() {
     local modem_info mode registration rsrp led_4g led_4g_state led_5g_state
     local prev_4g_state prev_5g_state modem_result
+    
+    load_config
     
     log_debug "=== LED Update Cycle Start ==="
     
@@ -369,7 +390,7 @@ update_led_status() {
             if [ -z "$registration" ]; then
                 log_debug "Registration empty, keeping current LED state"
                 return
-            elif [ "$registration" != "1" ] && [ "$registration" != "0" ] && [ "$registration" != "6" ]; then
+            elif [ "$registration" != "1" ] && [ "$registration" != "6" ]; then
                 log_debug "Registration invalid value '$registration', keeping current LED state"
                 return
             elif [ "$registration" = "0" ]; then
@@ -385,10 +406,12 @@ update_led_status() {
                 led_4g=$(get_4g_signal_led "$rsrp")
                 led_4g_state=$(basename "$led_4g")
                 
+                log_debug "Selected 4G LED: $led_4g_state"
+                
                 case "$mode" in
                     *"5G"*)
                         led_5g_state="wt:5g:blue"
-                        log_debug "5G mode - 4G: $led_4g_state, 5G: blue"
+                        log_debug "5G mode detected - 4G: $led_4g_state, 5G: blue"
                         ;;
                     *)
                         led_5g_state="off"
@@ -416,14 +439,28 @@ update_led_status() {
     log_debug "States - 4G: '$prev_4g_state' -> '$led_4g_state', 5G: '$prev_5g_state' -> '$led_5g_state'"
     
     if [ "$led_4g_state" != "$prev_4g_state" ]; then
+        log_debug "Updating 4G LEDs"
         for led in "$LED_4G_BLUE" "$LED_4G_GREEN" "$LED_4G_YELLOW"; do
             led_set_state "$led" "off"
         done
         
         case "$led_4g_state" in
-            "wt:4g:blue") led_set_state "$LED_4G_BLUE" "on" ;;
-            "wt:4g:green") led_set_state "$LED_4G_GREEN" "on" ;;
-            "wt:4g:yellow") led_set_state "$LED_4G_YELLOW" "on" ;;
+            "wt:4g:blue") 
+                led_set_state "$LED_4G_BLUE" "on" 
+                log_status "4G LED: Blue (excellent signal)"
+                ;;
+            "wt:4g:green") 
+                led_set_state "$LED_4G_GREEN" "on" 
+                log_status "4G LED: Green (good signal)"
+                ;;
+            "wt:4g:yellow") 
+                led_set_state "$LED_4G_YELLOW" "on" 
+                log_status "4G LED: Yellow (weak signal)"
+                ;;
+            "off") 
+                log_debug "All 4G LEDs turned off" 
+                log_status "4G LED: Off (no service)"
+                ;;
         esac
         
         grep -v "^4g=" "$STATES_FILE.status" 2>/dev/null > "$STATES_FILE.status.tmp" || touch "$STATES_FILE.status.tmp"
@@ -434,13 +471,24 @@ update_led_status() {
     fi
     
     if [ "$led_5g_state" != "$prev_5g_state" ]; then
+        log_debug "Updating 5G LEDs"
         for led in "$LED_5G_BLUE" "$LED_5G_YELLOW"; do
             led_set_state "$led" "off"
         done
         
         case "$led_5g_state" in
-            "wt:5g:blue") led_set_state "$LED_5G_BLUE" "on" ;;
-            "wt:5g:yellow") led_set_state "$LED_5G_YELLOW" "on" ;;
+            "wt:5g:blue") 
+                led_set_state "$LED_5G_BLUE" "on" 
+                log_status "5G LED: Blue (5G active)"
+                ;;
+            "wt:5g:yellow") 
+                led_set_state "$LED_5G_YELLOW" "on" 
+                log_status "5G LED: Yellow (5G standby)"
+                ;;
+            "off") 
+                log_debug "All 5G LEDs turned off" 
+                log_status "5G LED: Off (LTE only)"
+                ;;
         esac
         
         grep -v "^5g=" "$STATES_FILE.status" 2>/dev/null > "$STATES_FILE.status.tmp" || touch "$STATES_FILE.status.tmp"
@@ -463,6 +511,11 @@ start_daemon() {
     
     create_pid_file
     log_info "LED Modem Controller daemon started"
+    
+    load_config
+    local UPDATE_INTERVAL=$(uci -q get led-modem-controller.settings.update_interval || echo "30")
+    
+    log_status "Monitoring modem on $DEVICE, update interval: ${UPDATE_INTERVAL}s"
     
     while true; do
         log_debug "Main loop iteration"
@@ -516,6 +569,8 @@ stop_daemon() {
         return $EXIT_ERROR
     fi
     
+    load_config
+    
     for led in "$LED_4G_BLUE" "$LED_4G_GREEN" "$LED_4G_YELLOW" "$LED_5G_BLUE" "$LED_5G_YELLOW"; do
         echo 0 > "$led/brightness" 2>/dev/null || true
         echo none > "$led/trigger" 2>/dev/null || true
@@ -535,23 +590,28 @@ status_daemon() {
 }
 
 show_usage() {
-    cat << 'EOF'
+    cat << 'USAGE_EOF'
 Usage: led-modem-controller [COMMAND]
 
-LED Modem Controller for OpenWrt
+LED Modem Controller for OpenWrt v2.0
 
 COMMANDS:
     start      Start the daemon (default)
     stop       Stop the daemon
     restart    Restart the daemon
     status     Show daemon status
+    config     Show current configuration
     help       Show this help message
 
 DESCRIPTION:
     Monitors modem connection status and controls LEDs accordingly.
-    Updates every 30 seconds with timeout and error handling.
+    Features modular modem support, configurable devices, and 
+    updates based on UCI configuration.
 
-EOF
+CONFIGURATION:
+    Edit /etc/config/led-modem-controller to customize settings.
+
+USAGE_EOF
 }
 
 main() {
@@ -569,6 +629,15 @@ main() {
             ;;
         status)
             status_daemon
+            ;;
+        config)
+            load_config
+            echo "Current configuration:"
+            echo "Primary device: $DEVICE"
+            echo "Fallback devices: $FALLBACK_DEVICES"
+            echo "Update interval: $(uci -q get led-modem-controller.settings.update_interval || echo "30")s"
+            echo "Timeout: $TIMEOUT"s
+            echo "Debug: $DEBUG"
             ;;
         help|-h|--help)
             show_usage
