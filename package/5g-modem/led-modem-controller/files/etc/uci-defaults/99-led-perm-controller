@@ -26,6 +26,7 @@ uci -q get led-modem-controller.settings >/dev/null || {
 
 uci -q get led-modem-controller.settings.device >/dev/null || {
     uci delete led-modem-controller.settings.device
+    uci commit led-modem-controller
 }
 
 /etc/init.d/led-modem-controller enable

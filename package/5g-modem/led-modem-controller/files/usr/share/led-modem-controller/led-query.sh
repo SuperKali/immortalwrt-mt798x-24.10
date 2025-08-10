@@ -13,17 +13,6 @@ find_working_device() {
     log_debug "Looking for working device..."
     log_debug "Fallback devices: $FALLBACK_DEVICES"
 
-    local cached_device=""
-
-    if [ -f "$CACHE_FILE" ]; then
-        cached_device=$(cat "$CACHE_FILE" 2>/dev/null)
-        log_debug "Cached device: $cached_device"
-        if [ -n "$cached_device" ] && test_device_availability "$cached_device"; then
-            echo "$cached_device"
-            return 0
-        fi
-    fi
-
     local modem_id=$(get_modem_id_from_system)
     log_debug "Detected system modem ID: $modem_id"
     
@@ -38,7 +27,17 @@ find_working_device() {
         fi
     fi
 
-    log_debug "Preferred device failed, trying fallback devices"
+    local cached_device=""
+    if [ -f "$CACHE_FILE" ]; then
+        cached_device=$(cat "$CACHE_FILE" 2>/dev/null)
+        log_debug "Cached device: $cached_device"
+        if [ -n "$cached_device" ] && test_device_availability "$cached_device"; then
+            echo "$cached_device"
+            return 0
+        fi
+    fi
+
+    log_debug "Preferred and cached devices failed, trying fallback devices"
     for device in $FALLBACK_DEVICES; do
         log_debug "Testing fallback device: $device"
         if test_device_availability "$device"; then
