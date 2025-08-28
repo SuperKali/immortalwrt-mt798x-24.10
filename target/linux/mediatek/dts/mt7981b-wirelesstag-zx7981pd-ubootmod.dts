@@ -117,10 +117,6 @@
 	status = "okay";
 };
 
-&watchdog {
-	status = "okay";
-};
-
 &eth {
 	status = "okay";
 
@@ -306,6 +302,10 @@
 };
 
 &xhci {
+	status = "okay";
+};
+
+&watchdog {
 	status = "okay";
 };
 
