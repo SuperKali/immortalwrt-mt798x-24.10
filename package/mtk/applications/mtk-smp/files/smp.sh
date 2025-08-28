@@ -746,6 +746,7 @@ setup_model()
 		;;
 	*mt3000* |\
 	*wirelesstag* |\
+	huasifei,wh3000-pro |\
 	glinet,x3000-emmc |\
 	*xe3000* |\
 	*cudy* |\

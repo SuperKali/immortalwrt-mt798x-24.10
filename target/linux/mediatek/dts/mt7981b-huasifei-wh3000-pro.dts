@@ -159,6 +159,10 @@
 	};
 };
 
+&cpu_thermal {
+    /delete-node/ cooling-maps;
+};
+
 &pio {
 	mmc0_pins_default: mmc0-pins-default {
 		mux {
