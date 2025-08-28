@@ -172,10 +172,21 @@ zyxel,ex5601-t0-ubootmod)
 	ucidef_set_led_netdev "wifi-24g" "WIFI-2.4G" "green:wifi24g" "phy0-ap0" "link tx rx"
 	ucidef_set_led_netdev "wifi-5g" "WIFI-5G" "green:wifi5g" "phy1-ap0" "link tx rx"
 	;;
-*wirelesstag*)
+wirelesstag,zx7981pd|\
+wirelesstag,zx7981pd-ubootmod)
 	ucidef_set_led_default "power" "POWER" "wt:power:blue" "1"
 	ucidef_set_led_netdev "wlan2g" "WLAN2G" "wt:wifi:blue" "ra0" "link tx rx"
 	ucidef_set_led_netdev "wlan5g" "WLAN5G" "wt:wifi:blue" "rax0" "link tx rx"
+	;;
+wirelesstag,wt7981n)
+	ucidef_set_led_default "power-stip-blue" "POWERSTRIP BLUE" "wt:led-strip:blue" "0"
+	ucidef_set_led_default "power-stip-red" "POWERSTRIP RED" "wt:led-strip:red" "0"
+	ucidef_set_led_netdev "wlan2g" "WLAN2G" "wt:wifi:blue" "ra0" "link tx rx"
+	ucidef_set_led_netdev "wlan5g" "WLAN5G" "wt:wifi:blue" "rax0" "link tx rx"
+
+	ucidef_set_led_netdev "wan" "WAN" "wt:wan:orange" "wan" "link tx rx"
+	ucidef_set_led_netdev "lan1" "LAN1" "wt:lan1:orange" "lan1" "link tx rx"
+	ucidef_set_led_netdev "lan2" "LAN2" "wt:lan2:orange" "lan2" "link tx rx"
 	;;
 esac
 

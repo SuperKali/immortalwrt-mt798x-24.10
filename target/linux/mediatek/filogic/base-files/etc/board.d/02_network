@@ -143,6 +143,7 @@ mediatek_setup_interfaces()
 	tplink,re6000xd)
 		ucidef_set_interface_lan "lan1 lan2 eth1"
 		;;
+	wirelesstag,wt7981n|\
 	wirelesstag,zx7981pd|\
 	wirelesstag,zx7981pd-ubootmod)
 		ucidef_set_interfaces_lan_wan "lan1 lan2" wan
