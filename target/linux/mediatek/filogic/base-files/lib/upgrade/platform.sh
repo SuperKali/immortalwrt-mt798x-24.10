@@ -103,6 +103,7 @@ platform_do_upgrade() {
 	tplink,tl-xtr8488|\
 	wirelesstag,zx7981pd-ubootmod|\
 	wirelesstag,zx7981poeq-ubootmod|\
+	wirelesstag,wt7981n-ubootmod|\
 	xiaomi,mi-router-ax3000t-ubootmod|\
 	xiaomi,redmi-router-ax6000-ubootmod|\
 	xiaomi,mi-router-wr30u-ubootmod|\
