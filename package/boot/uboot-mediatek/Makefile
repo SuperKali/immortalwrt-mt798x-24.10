@@ -605,6 +605,18 @@ define U-Boot/mt7981_wirelesstag_zx7981poeq
   DEPENDS:=+trusted-firmware-a-mt7981-spim-nand-ddr3
 endef
 
+define U-Boot/mt7981_wirelesstag_wt7981n
+  NAME:=Wireless-Tag WT7981N
+  BUILD_SUBTARGET:=filogic
+  BUILD_DEVICES:=wirelesstag_wt7981n-ubootmod
+  UBOOT_CONFIG:=mt7981_wt7981n
+  UBOOT_IMAGE:=u-boot.fip
+  BL2_BOOTDEV:=nor
+  BL2_SOC:=mt7981
+  BL2_DDRTYPE:=ddr3
+  DEPENDS:=+trusted-firmware-a-mt7981-nor-ddr3
+endef
+
 define U-Boot/mt7981_xiaomi_mi-router-ax3000t
   NAME:=Xiaomi Router AX3000T
   BUILD_SUBTARGET:=filogic
@@ -1043,8 +1055,9 @@ UBOOT_TARGETS := \
 	mt7981_qihoo_360t7 \
 	mt7981_xiaomi_mi-router-ax3000t \
 	mt7981_xiaomi_mi-router-wr30u \
-  mt7981_wirelesstag_zx7981pd \
-  mt7981_wirelesstag_zx7981poeq \
+	mt7981_wirelesstag_zx7981pd \
+	mt7981_wirelesstag_zx7981poeq \
+	mt7981_wirelesstag_wt7981n \
 	mt7986_bananapi_bpi-r3-emmc \
 	mt7986_bananapi_bpi-r3-sdmmc \
 	mt7986_bananapi_bpi-r3-snand \
