@@ -1,0 +1,23 @@
+diff -u -r a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c	2025-09-01 21:33:57.488000292 +0800
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c	2025-09-01 21:37:10.665000384 +0800
+@@ -2650,11 +2650,15 @@
+ 		}
+ 
+ 		if (sent_ppd && ppd_dev){
+-		skb->protocol = eth_hdr(skb)->h_proto;
+-		skb->dev = ppd_dev;
++			skb->protocol = eth_hdr(skb)->h_proto;
++			skb->dev = ppd_dev;
++			skb_record_rx_queue(skb, 0);
++                	netif_receive_skb(skb);
++		}
++		else{
++			skb_record_rx_queue(skb, 0);
++			napi_gro_receive(napi, skb);
+ 		}
+-		skb_record_rx_queue(skb, 0);
+-		napi_gro_receive(napi, skb);
+ 
+ skip_rx:
+ 		ring->data[idx] = new_data;
