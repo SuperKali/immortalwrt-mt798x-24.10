@@ -339,47 +339,37 @@ void ppd_dev_setting(void)
         br_dev = __dev_get_by_name(&init_net, "br-lan");
         hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");
         atomic_set(&eth1_in_br, 0);
-        
-        ppd_dev = NULL;
-        
-        if (br_dev) {
-                struct net_device *dev;
-                struct list_head *pos;
-                netdev_for_each_lower_dev(br_dev, dev, pos) {
+                if (br_dev) {
+                        struct net_device *dev;
+                        struct list_head *pos;
+                        netdev_for_each_lower_dev(br_dev, dev, pos) {
                         if (dev->flags & IFF_UP) {
-                                if (netif_carrier_ok(dev)){
-                                        if (strcmp(dev->name, "eth0") == 0) {
-                                                continue;
-                                        }
-                                        ppd_dev = __dev_get_by_name(&init_net, dev->name);
-                                        break;
-                                }
-                        }
+							if (netif_carrier_ok(dev)){
+							ppd_dev = __dev_get_by_name(&init_net, dev->name);
+                                    if ((strcmp(dev->name, "eth0") == 0))     
+									{break;}
+									if (strncmp(dev->name, "lan", 3) == 0)     
+									{break;}
+									if ((strcmp(dev->name, "eth1") == 0))     
+									{break;}
+							}
+						}
+                    }
                 }
-        }
-        
-        if (!ppd_dev) {
-                return;
-        }
-        
         br_dev = __dev_get_by_name(&init_net, "eth1");
         if (br_dev){
-                if (br_dev->flags & IFF_UP){
-                        if (netif_carrier_ok(br_dev))
-                                hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1");
-                }
-        }
-        
+        if (br_dev->flags & IFF_UP){
+				if (netif_carrier_ok(br_dev))
+					hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1");
+                }}
         br_dev = __dev_get_by_name(&init_net, "eth0");
         if (br_dev){
-                if (br_dev->flags & IFF_UP){
-                        if (netif_carrier_ok(br_dev))
-                                hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");
-                }
-        }
-        
-        printk("\nrx now ppd dev is %s\n", hnat_priv->g_ppdev ? hnat_priv->g_ppdev->name : "(null)");
-        printk("\ntx now ppd dev is %s\n", ppd_dev ? ppd_dev->name : "(null)");
+        if (br_dev->flags & IFF_UP){
+				if (netif_carrier_ok(br_dev))
+                hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");
+                }}
+
+		printk(KERN_INFO "PPD Config: RX=%s TX=%s\n", hnat_priv->g_ppdev->name, ppd_dev->name);
 }
 
 int nf_hnat_netdevice_event(struct notifier_block *unused, unsigned long event,
