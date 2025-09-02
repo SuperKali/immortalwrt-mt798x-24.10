@@ -40,70 +40,54 @@
 		compatible = "gpio-leds";
 
 		led-0 {
-			label = "wt:4g:blue";
-			color = <LED_COLOR_ID_BLUE>;
+			label = "wt:4g:high";
+			color = <LED_COLOR_ID_GREEN>;
 			gpios = <&pio 12 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
 		led-1 {
-			label = "wt:sim2:blue";
-			color = <LED_COLOR_ID_BLUE>;
+			label = "wt:sim2:green";
+			color = <LED_COLOR_ID_GREEN>;
 			gpios = <&pio 11 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
 		led-2 {
-			label = "wt:5g:blue";
-			color = <LED_COLOR_ID_BLUE>;
+			label = "wt:5g:high";
+			color = <LED_COLOR_ID_GREEN>;
 			gpios = <&pio 9 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
 		led-3 {
-			label = "wt:4g:yellow";
-			color = <LED_COLOR_ID_YELLOW>;
+			label = "wt:4g:low";
+			color = <LED_COLOR_ID_GREEN>;
 			gpios = <&pio 5 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
 		led-4 {
-			label = "wt:power:blue";
-			color = <LED_COLOR_ID_BLUE>;
-			function = LED_FUNCTION_POWER;
+			label = "wt:run:green";
+			color = <LED_COLOR_ID_GREEN>;
 			gpios = <&pio 4 GPIO_ACTIVE_HIGH>;
-			default-state = "on";
+			default-state = "off";
 		};
 
 		led-5 {
-			label = "wt:5g:yellow";
-			color = <LED_COLOR_ID_YELLOW>;
+			label = "wt:5g:low";
+			color = <LED_COLOR_ID_GREEN>;
 			gpios = <&pio 10 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
 		led-6 {
-			label = "wt:sim1:blue";
-			color = <LED_COLOR_ID_BLUE>;
+			label = "wt:sim1:green";
+			color = <LED_COLOR_ID_GREEN>;
 			gpios = <&pio 13 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 
-		led-7 {
-			label = "wt:wan:blue";
-			color = <LED_COLOR_ID_BLUE>;
-			function = LED_FUNCTION_WAN;
-			gpios = <&pio 22 GPIO_ACTIVE_LOW>;
-			default-state = "off";
-		};
-
-		led-8 {
-			label = "wt:lan:blue";
-			color = <LED_COLOR_ID_BLUE>;
-			function = LED_FUNCTION_LAN;
-			gpios = <&pio 8 GPIO_ACTIVE_LOW>;
-			default-state = "off";
-		};
 	};
 
 	gpio-export {
