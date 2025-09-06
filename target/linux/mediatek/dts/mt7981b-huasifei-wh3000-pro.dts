@@ -16,8 +16,8 @@
 		serial0 = &uart0;
 		led-boot = &led_sys_red;
 		led-failsafe = &led_sys_red;
-		led-running = &led_sys_green;
-		led-upgrade = &led_sys_green;
+		led-running = &led_sys_blue;
+		led-upgrade = &led_sys_blue;
 	};
 
 	chosen {
@@ -62,8 +62,8 @@
 			gpios = <&pio 11 GPIO_ACTIVE_LOW>;
 		};
 
-		led_sys_green: led-1 {
-			color = <LED_COLOR_ID_GREEN>;
+		led_sys_blue: led-1 {
+			color = <LED_COLOR_ID_BLUE>;
 			function = LED_FUNCTION_STATUS;
 			gpios = <&pio 10 GPIO_ACTIVE_LOW>;
 		};
