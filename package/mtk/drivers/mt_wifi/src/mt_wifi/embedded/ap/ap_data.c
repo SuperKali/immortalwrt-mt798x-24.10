@@ -3967,8 +3967,8 @@ INT ap_rx_pkt_foward(RTMP_ADAPTER *pAd, struct wifi_dev *wdev, PNDIS_PACKET pPac
 					but not to air if match following case:
 						a). pMbss->IsolateInterStaTraffic == TRUE
 				*/
-				to_air = TRUE;
-				to_os = FALSE;
+				to_os = TRUE;
+				to_air = FALSE;
 
 				if (pMbss->IsolateInterStaTraffic == 1)
 					to_air = FALSE;
