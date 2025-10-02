@@ -11,10 +11,10 @@ do
 	fi
 	splash=$(uci -q get iframe.iframe.splashpage)
 	if [ $splash = "1" ]; then
-		mv /www/splash_files/check1.svg /www/splash_files/check.svg
+		mv /www/splash_files/check1.gif /www/splash_files/check.gif
 		ln -s /tmp/www/splash.html /www/splash.html
 	else
-		mv /www/splash_files/check.svg /www/splash_files/check1.svg
+		mv /www/splash_files/check.gif /www/splash_files/check1.gif
 		rm -f /www/splash.html
 	fi
 	sleep 10
