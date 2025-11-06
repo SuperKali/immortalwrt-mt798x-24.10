@@ -1991,6 +1991,9 @@
 	 struct foe_entry *entry;
 	 struct ethhdr *eth;
 	 struct hnat_bind_info_blk bfib1_tx;
+	 struct iphdr *iph;
+	 struct ipv6hdr *ip6h;
+	 u32 dscp = 0;
  
 	 if (skb_hnat_alg(skb) || !is_hnat_info_filled(skb) ||
 		 !is_magic_tag_valid(skb) || !IS_SPACE_AVAILABLE_HEAD(skb))
@@ -2081,6 +2084,8 @@
  
 	 /* MT7622 wifi hw_nat not support QoS */
 	 if (IS_IPV4_GRP(entry)) {
+		 iph = ip_hdr(skb);
+		 dscp = iph->tos;
 		 entry->ipv4_hnapt.iblk2.fqos = 0;
 		 if ((hnat_priv->data->version == MTK_HNAT_V2 &&
 			  gmac_no == NR_WHNAT_WDMA_PORT) ||
@@ -2114,11 +2119,13 @@
 				 bfib1_tx.vlan_layer = 1;
 				 entry->ipv4_hnapt.etype = htons(HQOS_MAGIC_TAG);
 				 entry->ipv4_hnapt.vlan1 = skb_hnat_entry(skb);
-				 entry->ipv4_hnapt.iblk2.fqos = 1;
+				 entry->ipv4_hnapt.iblk2.fqos = (dscp != 0) ? 1 : 0;
 			 }
 		 }
 		 entry->ipv4_hnapt.iblk2.dp = gmac_no;
 	 } else {
+		 ip6h = ipv6_hdr(skb);
+		 dscp =(ip6h->priority << 4 |(ip6h->flow_lbl[0] >> 4));
 		 entry->ipv6_5t_route.iblk2.fqos = 0;
 		 if ((hnat_priv->data->version == MTK_HNAT_V2 &&
 			  gmac_no == NR_WHNAT_WDMA_PORT) ||
@@ -2152,7 +2159,7 @@
 				 bfib1_tx.vlan_layer = 1;
 				 entry->ipv6_5t_route.etype = htons(HQOS_MAGIC_TAG);
 				 entry->ipv6_5t_route.vlan1 = skb_hnat_entry(skb);
-				 entry->ipv6_5t_route.iblk2.fqos = 1;
+				 entry->ipv6_5t_route.iblk2.fqos = (dscp != 0) ? 1 : 0;
 			 }
 		 }
 		 entry->ipv6_5t_route.iblk2.dp = gmac_no;
