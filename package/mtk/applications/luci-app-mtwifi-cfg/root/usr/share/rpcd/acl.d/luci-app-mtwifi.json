@@ -1,0 +1,13 @@
+{
+	"luci-app-mtwifi": {
+		"description": "Grant access to MediaTek WiFi disconnect commands",
+		"read": {
+			"file": {
+				"/usr/sbin/iwpriv": ["exec"],
+				"/usr/sbin/iwpriv * set DisConnectSta=*": ["exec"],
+				"/usr/sbin/mwctl": ["exec"],
+				"/usr/sbin/mwctl * set DisConnectSta=*": ["exec"]
+			}
+		}
+	}
+}

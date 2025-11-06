@@ -55,3 +55,18 @@ msgstr "无线网络设置错误"
 msgid "At least one MBSSID needs to be reserved"
 msgstr "至少需要保留1个MBSSID"
 
+
+msgid "The client has successfully disconnected"
+msgstr "客户端已成功断开"
+
+msgid "Failed to disconnect client: %s"
+msgstr "断开客户端失败：%s"
+
+msgid "Disconnect client: %s"
+msgstr "断开客户端：%s"
+
+msgid "iwpriv failed: "
+msgstr "iwpriv 失败："
+
+msgid "mwctl failed: "
+msgstr "mwctl 失败："
