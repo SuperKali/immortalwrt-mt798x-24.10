@@ -143,7 +143,7 @@
 +CONFIG_LMB_MAX_REGIONS=64
 +--- /dev/null
 +++ b/arch/arm/dts/mt7981b-wirelesstag-zx7981poeq-ubootmod.dts
-@@ -0,0 +1,200 @@
+@@ -0,0 +1,190 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * Copyright (C) 2024 Wireless-Tag
@@ -189,48 +189,38 @@
 +	leds {
 +		compatible = "gpio-leds";
 +
-+		power {
-+			label = "wt:power:blue";
++		run {
++			label = "wt:run:green";
 +			gpios = <&gpio 4 GPIO_ACTIVE_HIGH>;
 +		};
 +
-+		wan {
-+			label = "wt:wan:blue";
-+			gpios = <&gpio 22 GPIO_ACTIVE_LOW>;
-+		};
-+
-+		lan {
-+			label = "wt:lan:blue";
-+			gpios = <&gpio 8 GPIO_ACTIVE_LOW>;
-+		};
-+
-+		4g_blue {
-+			label = "wt:4g:blue";
++		4g_high {
++			label = "wt:4g:high";
 +			gpios = <&gpio 12 GPIO_ACTIVE_HIGH>;
 +		};
 +
-+		4g_yellow {
-+			label = "wt:4g:yellow";
++		4g_low {
++			label = "wt:4g:low";
 +			gpios = <&gpio 5 GPIO_ACTIVE_HIGH>;
 +		};
 +
-+		5g_blue {
-+			label = "wt:5g:blue";
++		5g_high {
++			label = "wt:5g:high";
 +			gpios = <&gpio 9 GPIO_ACTIVE_HIGH>;
 +		};
 +
-+		5g_yellow {
-+			label = "wt:5g:yellow";
++		5g_low {
++			label = "wt:5g:low";
 +			gpios = <&gpio 10 GPIO_ACTIVE_HIGH>;
 +		};
 +
 +		sim1 {
-+			label = "wt:sim1:blue";
++			label = "wt:sim1:green";
 +			gpios = <&gpio 13 GPIO_ACTIVE_HIGH>;
 +		};
 +
 +		sim2 {
-+			label = "wt:sim2:blue";
++			label = "wt:sim2:green";
 +			gpios = <&gpio 11 GPIO_ACTIVE_HIGH>;
 +		};
 +	};
