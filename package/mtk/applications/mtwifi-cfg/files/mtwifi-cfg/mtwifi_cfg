@@ -374,6 +374,7 @@ function mtwifi_cfg_setup(argv)
     dats.ApCliEnable = 0
     dats.ApCliSsid = ""
     dats.ApCliBssid = ""
+    dats.MACRepeaterEn = 0
     dats.ApcliMacAddress = ""
     dats.ApCliAuthMode = ""
     dats.ApCliEncrypType = ""
@@ -389,6 +390,7 @@ function mtwifi_cfg_setup(argv)
             end
             dats.ApCliSsid = v.config.ssid or ""
             dats.ApCliBssid = v.config.bssid or ""
+            dats.MACRepeaterEn = (v.config.bssid and v.config.bssid ~= "") and 1 or 0
             dats.ApcliMacAddress = v.config.macaddr or ""
             dats.ApCliAuthMode = defs.enc2dat[v.config.encryption][1]
             dats.ApCliEncrypType = defs.enc2dat[v.config.encryption][2]
