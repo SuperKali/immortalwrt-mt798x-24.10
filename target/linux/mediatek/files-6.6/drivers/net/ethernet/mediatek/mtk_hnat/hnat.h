@@ -904,7 +904,7 @@ enum FoeIpAct {
 	 (get_wifi_hook_if_index_from_dev(dev) != 0)) ? 1 : 0)
 #define IS_EXT(dev) ((get_index_from_dev(dev) != 0) ? 1 : 0)
 #define IS_PPD(dev)                                                            \
-        ((!strncmp(dev->name, "eth0", 4))   || (!strncmp(dev->name, "eth1", 3)))
+        ((!strncmp(dev->name, "eth0", 4))   || (!strncmp(dev->name, "eth1", 4)))
 #define IS_IPV4_HNAPT(x) (((x)->bfib1.pkt_type == IPV4_HNAPT) ? 1 : 0)
 #define IS_IPV4_HNAT(x) (((x)->bfib1.pkt_type == IPV4_HNAT) ? 1 : 0)
 #define IS_IPV4_GRP(x) (IS_IPV4_HNAPT(x) | IS_IPV4_HNAT(x))
