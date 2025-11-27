@@ -352,9 +352,11 @@ void ppd_dev_setting(void)
                         if (dev->flags & IFF_UP) {
 				if (netif_carrier_ok(dev)){
 					ppd_dev = __dev_get_by_name(&init_net, dev->name);
-                                	if (!strncmp(dev->name, "eth0",4))     
+                    if (!strncmp(dev->name, "eth0",4))     
 						break;
 					if (!strncmp(dev->name, "eth1",4))     
+						break;
+					if (!strncmp(dev->name, "lan",3))     
 						break;
 				}
 			}
@@ -377,6 +379,7 @@ void ppd_dev_setting(void)
 	pr_info("%s : now rx dev: %s, tx dev: %s\n", 
 		__func__, hnat_priv->g_ppdev->name, ppd_dev->name);
 }
+
 
 int nf_hnat_netdevice_event(struct notifier_block *unused, unsigned long event,
 			    void *ptr)
