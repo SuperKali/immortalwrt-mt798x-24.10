@@ -353,11 +353,9 @@
 				 }
  
 		 if (atomic_read(&eth1_in_br)){
-						 printk("eth1 in br-lan");
 						 hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth1");                        
 			 }
 				 else {
-					 printk("eth0 in br-lan");
 					 hnat_priv->g_ppdev = __dev_get_by_name(&init_net, "eth0");
 					 }
  }
