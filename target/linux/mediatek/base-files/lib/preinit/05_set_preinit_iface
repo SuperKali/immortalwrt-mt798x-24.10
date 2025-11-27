@@ -26,6 +26,7 @@ set_preinit_iface() {
 		ifname=lan
 		;;
 	xiaomi,mi-router-ax3000t|\
+	xiaomi,mi-router-ax3000t-mtkuboot|\
 	xiaomi,mi-router-ax3000t-ubootmod|\
 	xiaomi,mi-router-wr30u-stock|\
 	xiaomi,mi-router-wr30u-ubootmod|\
