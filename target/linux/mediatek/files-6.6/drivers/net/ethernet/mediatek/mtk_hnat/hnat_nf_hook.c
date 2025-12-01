@@ -26,7 +26,6 @@
 #include <net/udp.h>
 #include <net/netfilter/nf_conntrack.h>
 #include <net/netfilter/nf_conntrack_acct.h>
-
 #include "nf_hnat_mtk.h"
 #include "hnat.h"
 
@@ -2393,6 +2392,27 @@ static unsigned int mtk_hnat_nf_post_routing(
 }
 
 static unsigned int
+mtk_hnat_inet_local_in(void *priv,
+                       struct sk_buff *skb,
+                       const struct nf_hook_state *state)
+{
+	struct nf_conn *ct;
+	enum ip_conntrack_info ctinfo;
+
+	if (!skb)
+		return NF_ACCEPT;
+	if (hnat_priv->ext_if[0]->dev && FROM_WED(skb) && (skb_hnat_reason(skb) != HIT_BIND_FORCE_TO_CPU) && is_ppe_support_type(skb)){
+		ct = nf_ct_get(skb, &ctinfo);
+        	if (ct) {
+                	if ((ct->status & IPS_DST_NAT) || (ct->status & IPS_SRC_NAT))
+                        	return NF_ACCEPT;
+        	}
+		mtk_hnat_nf_post_routing(skb, hnat_priv->ext_if[0]->dev, 0, __func__, true);
+	}
+		return NF_ACCEPT;
+}
+
+static unsigned int
 mtk_hnat_br_nf_local_in(void *priv, struct sk_buff *skb,
 			const struct nf_hook_state *state)
 {
@@ -2678,7 +2698,8 @@ mtk_hnat_br_nf_local_out(void *priv, struct sk_buff *skb,
 
 	post_routing_print(skb, state->in, state->out, __func__);
 
-	if (IS_WHNAT(state->out) && !is_from_extge(skb) && !(FROM_GE_PPD(skb) || FROM_GE_LAN(skb) || FROM_GE_WAN(skb) || FROM_WED(skb) || FROM_EXT(skb))){
+	if ((!strncmp(state->out->name, "ra0",3) || !strncmp(state->out->name, "rax0",4)) && !is_from_extge(skb) && !( FROM_GE_PPD(skb) || FROM_GE_LAN(skb) ||
+		   FROM_GE_WAN(skb) || FROM_WED(skb) || FROM_EXT(skb))){
 		if (!do_hnat_cpu_to_ge(skb))
               		return NF_STOLEN;	
         }
@@ -2738,6 +2759,18 @@ static unsigned int mtk_hnat_br_nf_forward(void *priv,
 }
 
 static struct nf_hook_ops mtk_hnat_nf_ops[] __read_mostly = {
+	{
+        .hook     = mtk_hnat_inet_local_in,
+        .pf       = NFPROTO_IPV4,
+        .hooknum  = NF_INET_LOCAL_IN,
+        .priority = NF_IP_PRI_LAST,
+	},
+	{
+        .hook     = mtk_hnat_inet_local_in,
+        .pf       = NFPROTO_IPV6,
+        .hooknum  = NF_INET_LOCAL_IN,
+        .priority = NF_IP_PRI_LAST,
+	},
 	{
 		.hook = mtk_hnat_nf_conntrack,
 		.pf = NFPROTO_IPV4,
