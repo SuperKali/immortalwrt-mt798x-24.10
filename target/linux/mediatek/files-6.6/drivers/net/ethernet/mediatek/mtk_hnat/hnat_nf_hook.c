@@ -2399,10 +2399,6 @@ mtk_hnat_br_nf_local_in(void *priv, struct sk_buff *skb,
 	struct vlan_ethhdr *veth; 
 	if (!skb)
 		goto drop;
-	if ((IS_WHNAT(state->in) && FROM_WED(skb)) && (skb_hnat_reason(skb) != HIT_BIND_FORCE_TO_CPU) && is_ppe_support_type(skb)){
-	if (!mtk_hnat_nf_post_routing(skb, state->in, 0, __func__, true))
-                return NF_ACCEPT;
-	}	
 	if (!IS_WHNAT(state->in) && IS_EXT(state->in)) {
                 if (unlikely(skb_shinfo(skb)->frag_list))
                         return NF_ACCEPT;
