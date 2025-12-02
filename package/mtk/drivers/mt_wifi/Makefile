@@ -323,11 +323,19 @@ if [ "$$(CONFIG_MTK_WIFI_FW_BIN_LOAD)" = "y" ]; then \
 	rm -rf $(1)/lib/firmware/; \
 	$(INSTALL_DIR) $(1)/lib/firmware/; \
 	if [ "$$(CONFIG_MTK_CHIP_MT7986)" = "y" ] ; then \
-		$(INSTALL_BIN) ./files/$$(MT7986_FW_DIR)/WIFI_RAM_CODE_MT7986.bin \
-		./files/$$(MT7986_FW_DIR)/WIFI_RAM_CODE_MT7986_MT7975.bin \
-		./files/$$(MT7986_FW_DIR)/mt7986_patch_e1_hdr.bin \
-		./files/$$(MT7986_FW_DIR)/mt7986_patch_e1_hdr_mt7975.bin \
-		./files/$$(MT7986_FW_DIR)/7986_WACPU_RAM_CODE_release.bin $(1)/lib/firmware/; \
+		if [ "$$(CONFIG_MTK_MT7986_NEW_FW)" = "y" ]; then \
+			$(INSTALL_BIN) ./files/$$(MT7986_FW_DIR)/WIFI_RAM_CODE_MT7986.bin \
+			./files/$$(MT7986_FW_DIR)/WIFI_RAM_CODE_MT7986_MT7975.bin \
+			./files/$$(MT7986_FW_DIR)/mt7986_patch_e1_hdr.bin \
+			./files/$$(MT7986_FW_DIR)/mt7986_patch_e1_hdr_mt7975.bin \
+			./files/$$(MT7986_FW_DIR)/7986_WACPU_RAM_CODE_release.bin $(1)/lib/firmware/; \
+		else \
+			$(INSTALL_BIN) $(PKG_BUILD_DIR)/bin/mt7986/rebb/WIFI_RAM_CODE_MT7986.bin \
+			$(PKG_BUILD_DIR)/bin/mt7986/rebb/WIFI_RAM_CODE_MT7986_MT7975.bin \
+			$(PKG_BUILD_DIR)/bin/mt7986/rebb/mt7986_patch_e1_hdr.bin \
+			$(PKG_BUILD_DIR)/bin/mt7986/rebb/mt7986_patch_e1_hdr_mt7975.bin \
+			$(PKG_BUILD_DIR)/bin/mt7986/rebb/7986_WACPU_RAM_CODE_release.bin $(1)/lib/firmware/; \
+		fi ; \
 		if [ "$$(CONFIG_MTK_MT7986_NEW_FW)" = "y" ]; then \
 		if [ "$$(CONFIG_MTK_WIFI_SKU_TYPE)" = "AX4200" ] ; then \
 			$(INSTALL_BIN) ./files/$$(MT7986_FW_DIR)/MT7986_ePAeLNA_EEPROM_ONEADIE_DBDC.bin \
