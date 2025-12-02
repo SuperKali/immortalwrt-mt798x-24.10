@@ -2401,7 +2401,7 @@ mtk_hnat_inet_local_in(void *priv,
 
 	if (!skb)
 		return NF_ACCEPT;
-	if (hnat_priv->ext_if[0]->dev && FROM_WED(skb) && (skb_hnat_reason(skb) != HIT_BIND_FORCE_TO_CPU) && is_ppe_support_type(skb)){
+	if (hnat_priv->ext_if[0] && hnat_priv->ext_if[0]->dev && FROM_WED(skb) && (skb_hnat_reason(skb) != HIT_BIND_FORCE_TO_CPU) && is_ppe_support_type(skb)){
 		ct = nf_ct_get(skb, &ctinfo);
         	if (ct) {
                 	if ((ct->status & IPS_DST_NAT) || (ct->status & IPS_SRC_NAT))
