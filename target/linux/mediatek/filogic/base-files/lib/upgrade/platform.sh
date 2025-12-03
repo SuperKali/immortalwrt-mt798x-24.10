@@ -66,6 +66,7 @@ platform_do_upgrade() {
 	local board=$(board_name)
 
 	case "$board" in
+		netcore,n60-pro|\
         qihoo,360t7)
 		CI_UBIPART="ubi"
     		CI_KERNPART="kernel"
@@ -95,7 +96,6 @@ platform_do_upgrade() {
 	nokia,ea0326gmp|\
 	openwrt,one|\
 	netcore,n60|\
-	netcore,n60-pro|\
 	routerich,ax3000-ubootmod|\
 	tplink,tl-xdr4288|\
 	tplink,tl-xdr6086|\
