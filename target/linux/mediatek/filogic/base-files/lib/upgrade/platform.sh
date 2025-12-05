@@ -67,6 +67,7 @@ platform_do_upgrade() {
 
 	case "$board" in
 		netcore,n60-pro|\
+		xiaomi,redmi-router-ax6000-ubootmod|\
         qihoo,360t7)
 		CI_UBIPART="ubi"
     		CI_KERNPART="kernel"
@@ -104,7 +105,6 @@ platform_do_upgrade() {
 	wirelesstag,zx7981pd-ubootmod|\
 	wirelesstag,zx7981poeq-ubootmod|\
 	xiaomi,mi-router-ax3000t-ubootmod|\
-	xiaomi,redmi-router-ax6000-ubootmod|\
 	xiaomi,mi-router-wr30u-ubootmod|\
 	zyxel,ex5601-t0-ubootmod)
 		fit_do_upgrade "$1"
