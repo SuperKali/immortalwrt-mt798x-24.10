@@ -116,6 +116,9 @@ fi
     echo 3 > /proc/sys/vm/drop_caches
     sed -i '/prefer-family/d' /etc/wgetrc
     echo "prefer-family = IPv4" >> /etc/wgetrc
+    ifconfig eth1 down
+    sleep 2
+    ifconfig eth1 up
 }
 
 reload_service() {

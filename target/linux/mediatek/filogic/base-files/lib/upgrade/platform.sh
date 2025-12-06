@@ -66,9 +66,15 @@ platform_do_upgrade() {
 	local board=$(board_name)
 
 	case "$board" in
-		netcore,n60-pro|\
-		xiaomi,redmi-router-ax6000-ubootmod|\
-		xiaomi,mi-router-wr30u-ubootmod|\
+	netcore,n60-pro|\
+	tplink,tl-xdr4288|\
+        tplink,tl-xdr6086|\
+        tplink,tl-xdr6088|\
+	xiaomi,redmi-router-ax6000-ubootmod|\
+	xiaomi,mi-router-ax3000t-ubootmod|\
+        xiaomi,mi-router-wr30u-ubootmod|\
+	h3c,magic-nx30-pro|\
+	jcg,q30-pro|\
         qihoo,360t7)
 		CI_UBIPART="ubi"
     		CI_KERNPART="kernel"
@@ -86,9 +92,7 @@ platform_do_upgrade() {
 	cmcc,rax3000me|\
 	cudy,tr3000-v1-ubootmod|\
 	gatonetworks,gdsp|\
-	h3c,magic-nx30-pro|\
 	imou,lc-hx3001|\
-	jcg,q30-pro|\
 	konka,komi-a31|\
 	livinet,zr-3020-ubootmod|\
 	mediatek,mt7981-rfb|\
@@ -99,14 +103,9 @@ platform_do_upgrade() {
 	openwrt,one|\
 	netcore,n60|\
 	routerich,ax3000-ubootmod|\
-	tplink,tl-xdr4288|\
-	tplink,tl-xdr6086|\
-	tplink,tl-xdr6088|\
 	tplink,tl-xtr8488|\
 	wirelesstag,zx7981pd-ubootmod|\
 	wirelesstag,zx7981poeq-ubootmod|\
-	xiaomi,mi-router-ax3000t-ubootmod|\
-	xiaomi,mi-router-wr30u-ubootmod|\
 	zyxel,ex5601-t0-ubootmod)
 		fit_do_upgrade "$1"
 		;;
