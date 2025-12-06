@@ -37,7 +37,7 @@ extern atomic_t eth1_in_br;
 struct net_device *br_dev;
 struct net_device *eth1_dev;
 #define do_ge2ext_fast(dev, skb)                                               \
-	(skb_hnat_is_hashed(skb) && \
+	(skb_hnat_is_hashed(skb) && !is_from_extge(skb) && \
 	 skb_hnat_reason(skb) == HIT_BIND_FORCE_TO_CPU)
 #define do_ext2ge_fast_learn(dev, skb)                                         \
 	((skb_hnat_sport(skb) == NR_PDMA_PORT ||                           \
@@ -647,6 +647,7 @@ unsigned int do_hnat_ge_to_ext(struct sk_buff *skb, const char *func)
 	u8 index;
 	struct foe_entry *entry;
 	struct net_device *dev;
+	struct ethhdr *eth = eth_hdr(skb);
 
 	entry = &hnat_priv->foe_table_cpu[skb_hnat_ppe(skb)][skb_hnat_entry(skb)];
 
@@ -667,7 +668,11 @@ unsigned int do_hnat_ge_to_ext(struct sk_buff *skb, const char *func)
 	if (IS_WHNAT(dev))
 	{
 		skb_hnat_iface(skb) = FOE_MAGIC_WED0;
-		return 1;
+		skb_hnat_sport(skb) = NR_WDMA0_PORT;
+		set_from_extge(skb);
+                fix_skb_packet_type(skb, skb->dev, eth);
+                netif_rx(skb);
+		return 0;
 	}
 	if (IS_HQOS_MODE && eth_hdr(skb)->h_proto == HQOS_MAGIC_TAG) {
 		skb = skb_unshare(skb, GFP_ATOMIC);
@@ -2407,7 +2412,10 @@ mtk_hnat_inet_local_in(void *priv,
                 	if ((ct->status & IPS_DST_NAT) || (ct->status & IPS_SRC_NAT))
                         	return NF_ACCEPT;
         	}
-		mtk_hnat_nf_post_routing(skb, hnat_priv->ext_if[0]->dev, 0, __func__, true);
+		if (IS_WHNAT(skb->dev))
+			mtk_hnat_nf_post_routing(skb, skb->dev, 0, __func__, true);
+		else	
+			mtk_hnat_nf_post_routing(skb, hnat_priv->ext_if[0]->dev, 0, __func__, true);
 	}
 		return NF_ACCEPT;
 }
