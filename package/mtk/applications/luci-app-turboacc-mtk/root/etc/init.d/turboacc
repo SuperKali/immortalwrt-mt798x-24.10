@@ -81,8 +81,6 @@ for iface in eth0 eth1 wan; do
     else
         echo "$iface interface not found."
     fi
-    sed -i '/prefer-family/d' /etc/wgetrc
-    echo "prefer-family = IPv4" >> /etc/wgetrc
 done
 
     if echo "$fastpath_mh_eth_hnat_ap" | grep -qE '^([0-9]{1,3}\.){3}[0-9]{1,3}$'; then
@@ -114,6 +112,10 @@ done
 else
     echo "Invalid IPv4 address: $fastpath_mh_eth_hnat_ap"
 fi
+    echo 4096 > /proc/sys/vm/min_free_kbytes
+    echo 3 > /proc/sys/vm/drop_caches
+    sed -i '/prefer-family/d' /etc/wgetrc
+    echo "prefer-family = IPv4" >> /etc/wgetrc
 }
 
 reload_service() {

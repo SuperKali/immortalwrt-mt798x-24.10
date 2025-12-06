@@ -15,6 +15,7 @@ DEFAULT_PACKAGES += \
 	kmod-leds-gpio kmod-gpio-button-hotplug autocore-arm ethtool \
 	kmod-nft-socket kmod-nft-tproxy kmod-nft-nat kmod-inet-diag \
 	kmod-ipt-nat6 kmod-ipt-nat \
-	kmod-ipt-physdev kmod-nf-ipvs kmod-veth kmod-wireguard 
+	kmod-ipt-physdev kmod-nf-ipvs kmod-veth kmod-wireguard \
+	kmod-ipt-fullconenat kmod-fs-btrfs luci-app-ttyd
 
 $(eval $(call BuildTarget))
