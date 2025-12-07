@@ -120,6 +120,7 @@ platform_do_upgrade() {
 	huasifei,wh3000-emmc|\
 	*Airpi*|\
 	cmcc,rax3000m-emmc|\
+	philips,hy3000|\
 	smartrg,sdg-8612|\
 	smartrg,sdg-8614|\
 	smartrg,sdg-8622|\
@@ -237,6 +238,7 @@ platform_copy_config() {
 	glinet,gl-xe3000|\
 	huasifei,wh3000-emmc|\
 	cmcc,rax3000m-emmc|\
+	philips,hy3000|\
 	jdcloud,re-cp-03|\
 	smartrg,sdg-8612|\
 	smartrg,sdg-8614|\

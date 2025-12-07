@@ -53,6 +53,7 @@ mediatek_setup_interfaces()
 	livinet,zr-3020|\
 	livinet,zr-3020-ubootmod|\
 	qihoo,360t7|\
+	*philips,hy3000*|\
 	routerich,ax3000|\
 	routerich,ax3000-ubootmod)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" wan
@@ -219,6 +220,21 @@ mediatek_setup_macs()
 		label_mac=$(mtd_get_mac_ascii product_info ethaddr)
 		wan_mac=$label_mac
 		lan_mac=$(macaddr_add "$label_mac" 1)
+		;;
+	yvr,x6)
+		wan_mac=$(mtd_get_mac_ascii Factory_info MAC)
+		lan_mac=$(macaddr_add $wan_mac 1)
+		label_mac=$lan_mac
+		;;
+        sl,3000-emmc)
+ 		lan_mac=$(mmc_get_mac_binary factory 0x04)		
+ 		wan_mac=$(macaddr_add "$lan_mac" -2)
+ 		label_mac=$lan_mac
+ 		;;
+	philips,hy3000)
+		lan_mac=$(mmc_get_mac_binary factory 0x74)
+		wan_mac=$(macaddr factory $lan_mac 1)
+		label_mac=$wan_mac
 		;;
 	xiaomi,mi-router-ax3000t|\
 	xiaomi,mi-router-ax3000t-mtkuboot|\
