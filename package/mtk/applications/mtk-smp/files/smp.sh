@@ -768,20 +768,7 @@ setup_model()
 		MT7981_whnat $num_of_wifi $usbnet
 		;;
 	*)
-		if [ "$NUM_OF_CPU" = "4" ]; then
-			dbg "setup_model:MT7623 wifi#=$num_of_wifi"
-			MT7623 $num_of_wifi
-		elif [ "$NUM_OF_CPU" = "2" ]; then
-			if [ "$mt_whnat_en" = "1" ];then
-				MT7622_whnat $num_of_wifi
-			else
-				if [ "$wifi1_dbdc_idx" = "1" ]; then
-					MT7622_dbdc1 $num_of_wifi
-				else
-					MT7622 $num_of_wifi
-				fi
-			fi
-		fi
+		MT7986_whnat $num_of_wifi $usbnet
 		;;
 	esac
 }
