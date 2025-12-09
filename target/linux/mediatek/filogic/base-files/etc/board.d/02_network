@@ -176,7 +176,8 @@ mediatek_setup_macs()
 	local lan_mac=""
 	local wan_mac=""
 	local label_mac=""
-	local wifi_mac=""
+	local b0dat="$(l1dat if2dat ra0)"
+	local b1dat="$(l1dat if2dat rax0)"
 	case $board in
 	acer,predator-w6|\
 	acer,predator-w6d|\
@@ -266,18 +267,26 @@ mediatek_setup_macs()
 		wan_mac=$(macaddr_add "$label_mac" 1)
 		;;
 	esac
-		
-	wifi_mac=$(macaddr_add $(cat /sys/class/net/eth0/address) 3)
-        sed -i '/MacAddress=$wifi_mac/d' /etc/wireless/mediatek/mt7981.dbdc.b0.dat
-        echo "MacAddress=$wifi_mac" >> /etc/wireless/mediatek/mt7981.dbdc.b0.dat
-        wifi_mac=$(macaddr_add $(cat /sys/class/net/eth0/address) 4)
-        sed -i '/MacAddress=$wifi_mac/d' /etc/wireless/mediatek/mt7981.dbdc.b1.dat
-        echo "MacAddress=$wifi_mac" >> /etc/wireless/mediatek/mt7981.dbdc.b1.dat
-	sed -i '/MacAddress=$wifi_mac/d' /etc/wireless/mediatek/mt7986-ax6000.dbdc.b0.dat
-        echo "MacAddress=$wifi_mac" >> /etc/wireless/mediatek/mt7986-ax6000.dbdc.b0.dat
-	wifi_mac="$(macaddr_add $wifi_mac 1)"
-        sed -i '/MacAddress=$wifi_mac/d' /etc/wireless/mediatek/mt7986-ax6000.dbdc.b1.dat
-        echo "MacAddress=$wifi_mac" >> /etc/wireless/mediatek/mt7986-ax6000.dbdc.b1.dat
+
+	if [ -n "$label_mac" ]; then
+		base_mac="$label_mac"
+	elif [ -n "$wan_mac" ]; then
+		base_mac="$wan_mac"
+	elif [ -n "$lan_mac" ]; then
+		base_mac="$lan_mac"
+	else
+		base_mac=$(cat /sys/class/net/eth0/address)
+	fi
+
+	if [ -f ${b0dat} ] && ! grep -q "MacAddress=" ${b0dat}; then
+			local b0mac="$(macaddr_add "$base_mac" 3)"
+			echo "MacAddress=$b0mac" >> ${b0dat}
+		fi
+	if [ -f ${b1dat} ] && ! grep -q "MacAddress=" ${b1dat}; then
+			local b1mac="$(macaddr_add "$base_mac" 4)"
+			echo "MacAddress=$b1mac" >> ${b1dat}
+	fi
+
 	[ -n "$lan_mac" ] && ucidef_set_interface_macaddr "lan" $lan_mac
 	[ -n "$wan_mac" ] && ucidef_set_interface_macaddr "wan" $wan_mac
 	[ -n "$label_mac" ] && ucidef_set_label_macaddr $label_mac
