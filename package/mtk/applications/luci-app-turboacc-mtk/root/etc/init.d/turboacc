@@ -47,6 +47,8 @@ start_service() {
 		local hnat_path="/sys/kernel/debug/hnat"
 
 		config_get_bool "fastpath_mh_eth_hnat" "config" "fastpath_mh_eth_hnat" "1"
+		echo 1 > "$hnat_path/hook_toggle"
+		echo 0 > "$hnat_path/hook_toggle"
 		echo "$fastpath_mh_eth_hnat" > "$hnat_path/hook_toggle"
 
 		if [ "$fastpath_mh_eth_hnat" -eq "1" ]; then
